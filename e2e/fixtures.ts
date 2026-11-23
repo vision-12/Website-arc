@@ -1,0 +1,32 @@
+import AxeBuilder from '@axe-core/playwright';
+import { test as base, expect, type Page } from '@playwright/test';
+
+export const WCAG_TAGS = ['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa', 'wcag22aa'];
+
+/** Every page must pass axe with zero violations (MP §10). */
+export async function expectAxeClean(page: Page) {
+  const results = await new AxeBuilder({ page }).withTags(WCAG_TAGS).analyze();
+  const summary = results.violations.map(
+    (v) => `${v.id}: ${v.help} (${v.nodes.map((n) => n.target.join(' ')).join(', ')})`,
+  );
+  expect(summary, 'axe violations').toEqual([]);
+}
+
+/** Collects CSP violations reported by the browser; every test asserts none occurred. */
+export const test = base.extend<{ cspViolations: string[] }>({
+  cspViolations: async ({ page }, use) => {
+    const violations: string[] = [];
+    page.on('console', (msg) => {
+      if (/Content Security Policy|violates the following/.test(msg.text()))
+        violations.push(msg.text());
+    });
+    await use(violations);
+    expect(violations, 'CSP violations').toEqual([]);
+  },
+});
+
+export { expect };
+
+export async function screenshot(page: Page, name: string) {
+  await page.screenshot({ path: `test-results/screenshots/${name}.png`, fullPage: true });
+}

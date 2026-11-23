@@ -1,0 +1,20 @@
+/** Typed cache-tag builders (spec §4.0). Every 'use cache' scope and every revalidation uses these. */
+export const CacheTags = {
+  siteSettings: 'site-settings',
+  redirects: 'redirects',
+  sitemap: 'sitemap',
+  pages: 'pages',
+  page: (path: string) => `page:${path}`,
+  news: 'news',
+  newsArticle: (slug: string) => `news:${slug}`,
+  newsCategories: 'news-categories',
+  events: 'events',
+  event: (slug: string) => `event:${slug}`,
+  academics: 'academics',
+  gallery: 'gallery',
+  album: (slug: string) => `album:${slug}`,
+  staff: 'staff',
+  resources: 'resources',
+  admissionsPublic: 'admissions-public',
+  media: (id: string) => `media:${id}`,
+} as const;

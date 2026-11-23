@@ -1,0 +1,9 @@
+npx lint-staged
+npm run check:school-values --silent
+
+# Secret scanning (MP §7.5). CI is the hard gate; locally we scan when gitleaks is installed.
+if command -v gitleaks >/dev/null 2>&1; then
+  gitleaks protect --staged --redact --no-banner
+else
+  echo "warning: gitleaks not installed — staged files were not scanned for secrets locally (CI will scan)." >&2
+fi

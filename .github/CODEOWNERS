@@ -1,0 +1,4 @@
+# Security-critical paths need review from a maintainer (replace with real GitHub handles).
+# /supabase/            @altrastate/maintainers
+# /src/lib/security/    @altrastate/maintainers
+# /src/proxy.ts         @altrastate/maintainers

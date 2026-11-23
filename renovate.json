@@ -1,0 +1,34 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": ["config:recommended", ":semanticCommits"],
+  "schedule": ["before 6am on monday"],
+  "timezone": "Africa/Kampala",
+  "rangeStrategy": "pin",
+  "vulnerabilityAlerts": { "enabled": true, "schedule": ["at any time"], "labels": ["security"] },
+  "packageRules": [
+    {
+      "description": "React Server Components stack: grouped, reviewed together (MP §2.2). React stays on 19.2.x until ADR-000 is revised.",
+      "matchPackageNames": [
+        "next",
+        "eslint-config-next",
+        "react",
+        "react-dom",
+        "@types/react",
+        "@types/react-dom"
+      ],
+      "groupName": "next + react"
+    },
+    { "matchPackageNames": ["react", "react-dom"], "allowedVersions": "19.2.x" },
+    {
+      "description": "typescript-eslint supports TypeScript < 6.1",
+      "matchPackageNames": ["typescript"],
+      "allowedVersions": "<6.1"
+    },
+    { "matchPackageNames": ["@playwright/test", "playwright-core"], "groupName": "playwright" },
+    {
+      "matchDepTypes": ["devDependencies"],
+      "matchUpdateTypes": ["patch", "minor"],
+      "groupName": "dev dependencies (non-major)"
+    }
+  ]
+}
