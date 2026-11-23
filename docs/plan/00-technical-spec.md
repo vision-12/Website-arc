@@ -1463,12 +1463,21 @@ export interface TemplateDefinition {
 
 `RenderedRichText` is the React node output of `@tiptap/static-renderer`, produced in the shared loader. Templates receive nodes and never JSON.
 
-### 6.2 Theme token pipeline
-1. `getSiteSettings()` → `theme`.
-2. `buildThemeVars(theme)` (pure, unit-tested) returns `--brand-primary`, `--brand-primary-fg` (black or white, whichever has the better contrast), `--brand-secondary`, `--brand-secondary-fg`, `--brand-accent`, derived tints/shades (OKLCH, `-50…-900`), `--radius`, `--density-scale`, `--font-heading`, `--font-body` (next/font variables).
-3. The root layout emits a nonce'd `<style>:root{…}</style>` in `<head>` containing these variables. It is server-rendered, so there is no flash of unstyled theme. A `style=""` attribute on `<html>` is avoided because it would require `style-src-attr 'unsafe-inline'` under the strict CSP.
-4. Each template's `tokens.css` maps the brand vars into its semantic tokens (`--surface`, `--heading`, `--link`, `--focus-ring`…) inside `@theme inline`. The Tailwind utilities used by templates reference only the semantic tokens.
-5. Fonts: all allow-listed families are declared with `next/font/google` in `src/lib/fonts.ts`, with `preload: false` except the two selected ones. The selected families' variables are applied, and a max of 4 weights is defined in total per family pair.
+### 6.2 Theme token pipeline (amended in Phase 1, see ADR-000)
+1. `getSiteSettings()` → `{ settings, version }` (`'use cache'`, tag `site-settings`).
+2. `buildThemeVars(theme)` (pure, unit-tested) returns:
+   - `--brand-{primary,secondary,accent}` and their `-fg` (white or near-black, whichever has the better contrast)
+   - `-text`: an AA-on-white variant to use whenever a brand colour is text
+   - `-50…-900` OKLCH scales
+   - `--brand-radius`, `--brand-density`, `--brand-font-heading`, `--brand-font-body`
+3. **Delivered as `/theme.css?v=<version>`**, a same-origin stylesheet linked from the cached root layout. It is render-blocking (no unthemed flash), CSP-clean, and cached `immutable` per version. *Amendment:* the original "nonced inline `<style>`" approach was dropped because React drops nonces on hoisted `<style>` elements, and a per-request read would remove the prerendered shell.
+4. Each template's `tokens.css` maps the brand variables onto its semantic tokens inside `@theme inline`. Templates use `--brand-*-text` for coloured text.
+5. Fonts: the 8 allow-listed `next/font/google` families define their CSS variables on `<html>`, with `preload: false`, so only the families the theme references are downloaded. Each has ≤ 2 weights.
+6. `validateThemeContrast(theme)` (Phase 5 UI):
+   - primary needs ≥ 4.5:1 on white
+   - secondary needs ≥ 4.5:1 with its automatic ink
+   - accent needs ≥ 3:1 on white
+   - each failure comes with a plain-language message and a same-hue suggested shade
 
 ### 6.3 Homepage section registry (`src/features/templates/shared/sections.ts`)
 

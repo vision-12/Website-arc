@@ -1,6 +1,6 @@
 # Phase 1 — Foundation & design system (plan)
 
-**Status:** awaiting approval. Nothing in this file has been built yet.
+**Status:** approved 23 Nov 2026 (P1-A option 1, P1-B 19.2.9, P1-C yes) and **implemented**. Deviations found during the build are recorded in ADR-000: no `'strict-dynamic'`, `/theme.css` instead of an inline style, Radix Toast instead of sonner, and static placeholder routes instead of `/admin/[section]`.
 **Inputs:**
 - MASTER_PROMPT §2, §4, §10, §11 and §12 (Phase 1 prompt)
 - Spec §0, §5.0, §6.2 and §8.1
