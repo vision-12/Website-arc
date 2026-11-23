@@ -1,0 +1,42 @@
+/*
+ * Altrastate product identity (PRD §22.2) — admin interface only, never the public site.
+ * Midnight Blue #0B1F3A, Electric Cyan #00C2FF, Light Gray #F5F7FA.
+ * Electric Cyan fails contrast as text on light backgrounds: it is used ONLY for focus rings,
+ * active indicators and borders (enforced by src/app/admin/__tests__/admin-tokens.test.ts).
+ *
+ * Scoped with :root:has(.admin-scope) so portalled UI (drawer, dialogs, menus, toasts), which
+ * React renders directly under <body>, receives the admin tokens too.
+ */
+:root:has(.admin-scope) {
+  --altrastate-midnight: #0b1f3a;
+  --altrastate-cyan: #00c2ff;
+  --altrastate-light: #f5f7fa;
+
+  --background: var(--altrastate-light);
+  --foreground: var(--altrastate-midnight);
+  --card: #ffffff;
+  --card-foreground: var(--altrastate-midnight);
+  --popover: #ffffff;
+  --popover-foreground: var(--altrastate-midnight);
+  --primary: var(--altrastate-midnight);
+  --primary-foreground: #ffffff;
+  --muted-foreground: #475569;
+  --ring: var(--altrastate-cyan);
+  --admin-sidebar: var(--altrastate-midnight);
+  --admin-sidebar-foreground: #e2e8f0;
+  --admin-sidebar-active: #13325c;
+  --admin-indicator: var(--altrastate-cyan);
+}
+
+/*
+ * Two-tone focus ring: cyan alone is ~1.9:1 on Light Gray (fails WCAG 1.4.11's 3:1), so a Midnight
+ * inner ring carries the contrast on light surfaces and the cyan outer ring on the dark sidebar.
+ */
+:root:has(.admin-scope) :focus-visible {
+  outline: 3px solid var(--altrastate-cyan);
+  outline-offset: 2px;
+  box-shadow: 0 0 0 2px var(--altrastate-midnight);
+}
+:root:has(.admin-scope) .admin-sidebar :focus-visible {
+  box-shadow: 0 0 0 2px #ffffff;
+}
