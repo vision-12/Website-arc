@@ -1,0 +1,11 @@
+docs/PRD.pdf
+docs/MASTER_PROMPT.md
+docs/plan/
+package-lock.json
+.next
+coverage
+playwright-report
+test-results
+.husky
+test-results
+public
