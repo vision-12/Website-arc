@@ -1,3 +1,4 @@
+set -e
 npx lint-staged
 npm run check:school-values --silent
 

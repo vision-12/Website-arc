@@ -1,0 +1,141 @@
+# Mutation check: deliberately weakened policies/triggers applied to the local throwaway DB
+# (mutations: see the SQL at the top of this file), then the suite was run. Every mutation is caught.
+
+-- -- Deliberately weakened security, applied ONLY to the local throwaway database, to prove the suite catches it.
+-- drop policy applications_select on public.applications;
+-- create policy applications_select on public.applications for select to anon, authenticated using (true);
+-- drop policy admission_notes_select on public.admission_notes;
+-- create policy admission_notes_select on public.admission_notes for select to authenticated using (true);
+-- create function public.mutant_definer() returns int language sql security definer as $$ select 1 $$;
+-- create policy mutant_bare_uid on public.pages for select to authenticated using (created_by = auth.uid());
+-- drop trigger user_roles_guard on public.user_roles;
+-- drop trigger activity_logs_append_only on public.activity_logs;
+
+/home/user/website-arc/supabase/tests/000_setup_helpers.sql ....... ok
+/home/user/website-arc/supabase/tests/00_rls_enabled.sql .......... ok
+/home/user/website-arc/supabase/tests/01_policy_uid_initplan.sql .. 
+# Failed test 1: "no policy calls a bare auth.uid()"
+#         have: {public.pages/mutant_bare_uid}
+#         want: {}
+# Looks like you failed 1 test of 2
+Failed 1/2 subtests 
+/home/user/website-arc/supabase/tests/02_definer_search_path.sql .. 
+# Failed test 1: "every security-definer function pins search_path to empty"
+#         have: {public.mutant_definer}
+#         want: {}
+# Looks like you failed 1 test of 2
+Failed 1/2 subtests 
+/home/user/website-arc/supabase/tests/03_policy_text.sql .......... 
+# Failed test 1: "Table public.pages should have the correct policies"
+#     Extra policies:
+#         mutant_bare_uid
+# Looks like you failed 1 test of 4
+Failed 1/4 subtests 
+/home/user/website-arc/supabase/tests/10_anon_reads.sql ........... 
+# Failed test 6: "anon cannot read applications"
+#         have: 1
+#         want: 0
+# Looks like you failed 1 test of 26
+Failed 1/26 subtests 
+/home/user/website-arc/supabase/tests/11_anon_writes.sql .......... ok
+/home/user/website-arc/supabase/tests/20_role_isolation.sql ....... 
+# Failed test 1: "content editor cannot read applications"
+#         have: 1
+#         want: 0
+# Failed test 3: "content editor cannot read admission notes"
+#         have: 1
+#         want: 0
+# Failed test 8: "events manager cannot read applications"
+#         have: 1
+#         want: 0
+# Failed test 10: "without admissions.view_notes, notes are hidden"
+#         have: 1
+#         want: 0
+# Looks like you failed 4 tests of 17
+Failed 4/17 subtests 
+/home/user/website-arc/supabase/tests/21_deactivated.sql .......... 
+# Failed test 2: "deactivated user reads no applications"
+#         have: 1
+#         want: 0
+# Looks like you failed 1 test of 5
+Failed 1/5 subtests 
+/home/user/website-arc/supabase/tests/22_escalation.sql ........... 
+# Failed test 2: "a school admin cannot grant super admin (permissions they do not hold)"
+#       caught: no exception
+#       wanted: 42501
+# Failed test 5: "headteacher cannot grant school administrator"
+#       caught: no exception
+#       wanted: 42501
+# Failed test 9: "the last super admin cannot be demoted"
+#       caught: no exception
+#       wanted: P0001
+# Failed test 10: "the last super admin cannot be deactivated"
+#       caught: 42501: FORBIDDEN
+#       wanted: P0001: LAST_SUPER_ADMIN
+# Failed test 11: "super admin can create custom roles"
+#     died: 42501: new row violates row-level security policy for table "roles"
+#         CONTEXT:
+#             SQL statement "insert into public.roles (key, name) values ('custom_role', 'Custom role')"
+#             PL/pgSQL function lives_ok(text,text) line 14 at EXECUTE
+# Looks like you failed 5 tests of 11
+Failed 5/11 subtests 
+/home/user/website-arc/supabase/tests/23_mfa.sql .................. 
+# Failed test 1: "admissions officer without MFA sees no applications"
+#         have: 1
+#         want: 0
+# Failed test 4: "with the school flag on, aal1 is refused"
+#         have: 1
+#         want: 0
+# Looks like you failed 2 tests of 5
+Failed 2/5 subtests 
+/home/user/website-arc/supabase/tests/24_support_access.sql ....... 
+# Failed test 2: "platform support cannot read applications by default"
+#         have: 1
+#         want: 0
+# Failed test 7: "an expired grant gives no access"
+#         have: 1
+#         want: 0
+# Looks like you failed 2 tests of 7
+Failed 2/7 subtests 
+/home/user/website-arc/supabase/tests/30_lifecycle.sql ............ ok
+/home/user/website-arc/supabase/tests/31_append_only.sql .......... 
+# Failed test 1: "activity_logs cannot be updated"
+#       caught: no exception
+#       wanted: P0001
+# Failed test 2: "activity_logs cannot be deleted"
+#       caught: no exception
+#       wanted: P0001
+# Looks like you failed 2 tests of 6
+Failed 2/6 subtests 
+/home/user/website-arc/supabase/tests/40_submit_application.sql ... 
+# Failed (TODO) test 1: "submit_application rejects a client-supplied status"
+# Failed (TODO) test 2: "submit_application rejects a client-supplied reference"
+ok
+/home/user/website-arc/supabase/tests/41_reference.sql ............ ok
+/home/user/website-arc/supabase/tests/44_storage_staff.sql ........ ok
+/home/user/website-arc/supabase/tests/45_auth_admin_jobs.sql ...... ok
+
+Test Summary Report
+-------------------
+/home/user/website-arc/supabase/tests/01_policy_uid_initplan.sql (Wstat: 0 Tests: 2 Failed: 1)
+  Failed test:  1
+/home/user/website-arc/supabase/tests/02_definer_search_path.sql (Wstat: 0 Tests: 2 Failed: 1)
+  Failed test:  1
+/home/user/website-arc/supabase/tests/03_policy_text.sql        (Wstat: 0 Tests: 4 Failed: 1)
+  Failed test:  1
+/home/user/website-arc/supabase/tests/10_anon_reads.sql         (Wstat: 0 Tests: 26 Failed: 1)
+  Failed test:  6
+/home/user/website-arc/supabase/tests/20_role_isolation.sql     (Wstat: 0 Tests: 17 Failed: 4)
+  Failed tests:  1, 3, 8, 10
+/home/user/website-arc/supabase/tests/21_deactivated.sql        (Wstat: 0 Tests: 5 Failed: 1)
+  Failed test:  2
+/home/user/website-arc/supabase/tests/22_escalation.sql         (Wstat: 0 Tests: 11 Failed: 5)
+  Failed tests:  2, 5, 9-11
+/home/user/website-arc/supabase/tests/23_mfa.sql                (Wstat: 0 Tests: 5 Failed: 2)
+  Failed tests:  1, 4
+/home/user/website-arc/supabase/tests/24_support_access.sql     (Wstat: 0 Tests: 7 Failed: 2)
+  Failed tests:  2, 7
+/home/user/website-arc/supabase/tests/31_append_only.sql        (Wstat: 0 Tests: 6 Failed: 2)
+  Failed tests:  1-2
+Files=18, Tests=118,  2 wallclock secs ( 0.08 usr  0.03 sys +  0.15 cusr  0.07 csys =  0.33 CPU)
+Result: FAIL

@@ -20,7 +20,13 @@
     "check:school-values": "node scripts/check-school-values.mjs",
     "check:audit": "node scripts/check-audit.mjs",
     "prepare": "husky || true",
-    "verify": "npm run typecheck && npm run lint && npm run check:school-values && npm run test && npm run build"
+    "verify": "npm run typecheck && npm run lint && npm run check:school-values && npm run test && npm run build",
+    "db:start": "SUPABASE_INTERNAL_IMAGE_REGISTRY=ghcr.io supabase start -x studio,imgproxy,edge-runtime,logflare,vector,realtime,postgres-meta,supavisor",
+    "db:reset": "supabase db reset",
+    "db:types": "supabase gen types typescript --local > src/types/database.ts && prettier --write src/types/database.ts",
+    "db:lint": "supabase db lint --level warning --fail-on warning",
+    "db:advisors": "supabase db advisors",
+    "test:db": "supabase test db"
   },
   "dependencies": {
     "class-variance-authority": "0.7.1",
@@ -57,6 +63,7 @@
     "playwright-core": "1.63.0",
     "prettier": "3.10.1",
     "prettier-plugin-tailwindcss": "0.8.1",
+    "supabase": "3.3.0",
     "tailwindcss": "4.3.5",
     "typescript": "5.9.3",
     "typescript-eslint": "8.74.0",
