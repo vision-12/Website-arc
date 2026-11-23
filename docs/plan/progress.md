@@ -2,4 +2,5 @@
 
 | Phase | Status | Notes |
 |---|---|---|
-| 0 — Technical spec | Draft reconciled with PRD v1.0, awaiting approval | Open questions in spec §9 (Q1–Q25) |
+| 0 — Technical spec | **Approved 23 Nov 2026**; open questions on provisional defaults (`00-decisions.md`) | |
+| 1 — Foundation & design system | Plan written (`phase-01.md`), awaiting approval | Decisions P1-A, P1-B, P1-C |

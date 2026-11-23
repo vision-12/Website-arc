@@ -2,7 +2,7 @@
 
 | | |
 |---|---|
-| Status | **DRAFT — awaiting approval** (Phase 0). No application code is written until this is approved. |
+| Status | **APPROVED 23 Nov 2026.** Open questions run on provisional defaults; see `docs/plan/00-decisions.md`. |
 | Date | 22 Nov 2026 |
 | Binding inputs | `CLAUDE.md`, `docs/MASTER_PROMPT.md` (cited as **MP §n**), `docs/PRD.pdf` (cited as **PRD §n**) |
 | Precedence | MP over PRD (MP §0). This spec refines both. Where it adds to or departs from MP, the item is tagged **[EXT]** (an extension the spec needed) or **[DEV]** (a deliberate deviation, with its reason). Approving this spec approves every [EXT] and [DEV]. |
