@@ -12,3 +12,6 @@ next-env.d.ts
 .vercel
 .DS_Store
 .provision/
+
+# Claude Code: personal settings stay local (project skills and .mcp.json are shared)
+.claude/settings.local.json
