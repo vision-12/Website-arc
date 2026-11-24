@@ -222,7 +222,9 @@ create trigger profiles_last_super_admin after update of status on public.profil
 create or replace function private.profile_update_guard()
 returns trigger language plpgsql security definer set search_path = '' as $$
 begin
-  if not private.is_end_user() then return new; end if;
+  -- System context, or one of our own definer RPCs (record_login, accept_invite) that set this
+  -- transaction-local flag around a single statement. API clients cannot call set_config.
+  if not private.is_end_user() or current_setting('app.trusted_rpc', true) = 'on' then return new; end if;
   if new.id <> old.id or new.email <> old.email or new.mfa_enrolled <> old.mfa_enrolled
      or new.last_login_at is distinct from old.last_login_at then
     raise exception 'FORBIDDEN' using errcode = '42501', detail = 'These profile fields are managed by the system.';

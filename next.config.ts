@@ -27,6 +27,8 @@ const config: NextConfig = {
   reactStrictMode: true,
   experimental: {
     serverActions: { allowedOrigins: [siteUrl.host] },
+    // forbidden() / unauthorized() → 403/401 pages for permission failures.
+    authInterrupts: true,
   },
   images: {
     formats: ['image/avif', 'image/webp'],

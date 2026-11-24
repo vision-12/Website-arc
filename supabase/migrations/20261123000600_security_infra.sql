@@ -52,9 +52,9 @@ begin
 end $$;
 revoke all on function private.verify_ticket(text, text, jsonb) from public, anon, authenticated;
 
--- Fixed-window counter. Raises RATE_LIMITED (SQLSTATE PT429) once `p_max` is exceeded.
-create or replace function private.rate_limit_hit(p_key text, p_max integer, p_window_seconds integer)
-returns void language plpgsql security definer set search_path = '' as $$
+-- Fixed-window counter. Returns the count in the current window, including this hit.
+create or replace function private.rate_limit_hit(p_key text, p_window_seconds integer)
+returns integer language plpgsql security definer set search_path = '' as $$
 declare
   v_window timestamptz := to_timestamp(floor(extract(epoch from now()) / p_window_seconds) * p_window_seconds);
   v_count integer;
@@ -62,30 +62,51 @@ begin
   insert into private.rate_limit_buckets as b (key, window_start, count) values (p_key, v_window, 1)
   on conflict (key, window_start) do update set count = b.count + 1
   returning count into v_count;
-  if v_count > p_max then
+  return v_count;
+end $$;
+revoke all on function private.rate_limit_hit(text, integer) from public, anon, authenticated;
+
+-- Raising variant for RPCs that should abort outright (SQLSTATE PT429).
+create or replace function private.rate_limit_enforce(p_key text, p_max integer, p_window_seconds integer)
+returns void language plpgsql security definer set search_path = '' as $$
+begin
+  if private.rate_limit_hit(p_key, p_window_seconds) > p_max then
     raise exception 'RATE_LIMITED' using errcode = 'PT429';
   end if;
 end $$;
-revoke all on function private.rate_limit_hit(text, integer, integer) from public, anon, authenticated;
+revoke all on function private.rate_limit_enforce(text, integer, integer) from public, anon, authenticated;
 
 -- Login / password-reset throttling (spec §4.7). Ticket-gated so a third party cannot exhaust a
--- victim's per-email budget by calling the RPC directly with the public key.
+-- victim's per-email budget by calling the RPC directly with the public key. Returns whether the
+-- attempt may proceed; the first blocked attempt in a window is written to the audit log
+-- (returning instead of raising keeps that log row). The per-IP limit is generous because a
+-- school office often shares one public IP address.
 create or replace function public.rate_limit_check_auth(p_ticket jsonb, p_payload text)
-returns void language plpgsql security definer set search_path = '' as $$
-declare v jsonb;
+returns boolean language plpgsql security definer set search_path = '' as $$
+declare
+  v jsonb;
+  v_ip int; v_email int; v_ip_max int; v_email_max int; v_window int;
 begin
   perform private.verify_ticket('auth', p_payload, p_ticket);
   v := p_payload::jsonb;
   case v ->> 'action'
-    when 'login' then
-      perform private.rate_limit_hit('login:ip:' || (p_ticket ->> 'ipHash'), 5, 900);
-      perform private.rate_limit_hit('login:email:' || (v ->> 'emailHash'), 10, 3600);
-    when 'reset' then
-      perform private.rate_limit_hit('reset:ip:' || (p_ticket ->> 'ipHash'), 3, 3600);
-      perform private.rate_limit_hit('reset:email:' || (v ->> 'emailHash'), 3, 3600);
-    else
-      raise exception 'VALIDATION' using errcode = '22023';
+    when 'login' then v_ip_max := 30; v_email_max := 10; v_window := 900;
+    when 'reset' then v_ip_max := 10; v_email_max := 3; v_window := 3600;
+    else raise exception 'VALIDATION' using errcode = '22023';
   end case;
+  v_ip := private.rate_limit_hit((v ->> 'action') || ':ip:' || (p_ticket ->> 'ipHash'), v_window);
+  v_email := private.rate_limit_hit((v ->> 'action') || ':email:' || (v ->> 'emailHash'), v_window);
+  if v_ip > v_ip_max or v_email > v_email_max then
+    if v_ip = v_ip_max + 1 or v_email = v_email_max + 1 then
+      insert into public.activity_logs (source, action, summary, metadata, ip_hash)
+      values ('db', 'auth.' || (v ->> 'action') || '_burst',
+              'Repeated sign-in or reset attempts were blocked',
+              jsonb_build_object('emailHash', v ->> 'emailHash', 'ipCount', v_ip, 'emailCount', v_email),
+              p_ticket ->> 'ipHash');
+    end if;
+    return false;
+  end if;
+  return true;
 end $$;
 revoke all on function public.rate_limit_check_auth(jsonb, text) from public;
 grant execute on function public.rate_limit_check_auth(jsonb, text) to anon, authenticated;

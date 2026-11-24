@@ -6,6 +6,9 @@ const valid = {
   NEXT_PUBLIC_SUPABASE_URL: 'https://abcd.supabase.co',
   NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: 'sb_publishable_abc123',
   SCHOOL_SLUG: 'example-school',
+  CRON_SECRET: 'c'.repeat(40),
+  FORM_SIGNING_SECRET: 'f'.repeat(40),
+  IP_HASH_SALT: 's'.repeat(40),
 };
 
 describe('environment validation', () => {

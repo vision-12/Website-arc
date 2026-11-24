@@ -29,8 +29,9 @@ create policy activity_logs_select on public.activity_logs for select to authent
 
 -- Application-level audit entry. The actor is always the caller; it cannot be supplied.
 create or replace function public.log_activity(
-  p_action text, p_entity_type text, p_entity_id text, p_summary text,
-  p_diff jsonb, p_metadata jsonb, p_ip_hash text
+  p_action text, p_summary text,
+  p_entity_type text default null, p_entity_id text default null,
+  p_diff jsonb default null, p_metadata jsonb default null, p_ip_hash text default null
 ) returns bigint language plpgsql security definer set search_path = '' as $$
 declare v_id bigint; v_label text;
 begin

@@ -1,0 +1,5 @@
+<!-- Local development template; production templates are set at provisioning. -->
+<h2>Reset your password</h2>
+<p>We received a request to reset the password for your school website account.</p>
+<p><a href="{{ .SiteURL }}/auth/confirm?token_hash={{ .TokenHash }}&type=recovery&next=/reset-password">Choose a new password</a></p>
+<p>This link can be used once and expires in one hour. If you did not ask for this, you can ignore this email — your password has not changed.</p>

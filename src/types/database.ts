@@ -1651,26 +1651,31 @@ export type Database = {
       [_ in never]: never;
     };
     Functions: {
+      accept_invite: { Args: { p_full_name: string }; Returns: undefined };
       has_permission: { Args: { p: string }; Returns: boolean };
       housekeeping: { Args: Record<PropertyKey, never>; Returns: Json };
       log_activity: {
         Args: {
           p_action: string;
-          p_diff: Json;
-          p_entity_id: string;
-          p_entity_type: string;
-          p_ip_hash: string;
-          p_metadata: Json;
+          p_diff?: Json;
+          p_entity_id?: string;
+          p_entity_type?: string;
+          p_ip_hash?: string;
+          p_metadata?: Json;
           p_summary: string;
         };
         Returns: number;
       };
-      rate_limit_check_auth: { Args: { p_payload: string; p_ticket: Json }; Returns: undefined };
+      my_access: { Args: Record<PropertyKey, never>; Returns: Json };
+      rate_limit_check_auth: { Args: { p_payload: string; p_ticket: Json }; Returns: boolean };
+      record_login: { Args: Record<PropertyKey, never>; Returns: undefined };
+      revoke_user_sessions: { Args: { p_user: string }; Returns: number };
       update_private_settings: { Args: { p_value: Json; p_version: number }; Returns: number };
       update_site_settings: {
         Args: { p_section: string; p_value: Json; p_version: number };
         Returns: number;
       };
+      user_has_permission: { Args: { p: string; p_user: string }; Returns: boolean };
     };
     Enums: {
       content_status: 'draft' | 'in_review' | 'scheduled' | 'published' | 'archived';

@@ -10,7 +10,7 @@
     "dev": "next dev --turbopack",
     "build": "next build",
     "start": "next start",
-    "typecheck": "tsc --noEmit",
+    "typecheck": "next typegen && tsc --noEmit",
     "lint": "eslint . --max-warnings=0",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
@@ -26,9 +26,13 @@
     "db:types": "supabase gen types typescript --local > src/types/database.ts && prettier --write src/types/database.ts",
     "db:lint": "supabase db lint --level warning --fail-on warning",
     "db:advisors": "supabase db advisors",
-    "test:db": "supabase test db"
+    "test:db": "supabase test db",
+    "check:actions": "node scripts/check-actions.mjs"
   },
   "dependencies": {
+    "@supabase/postgrest-js": "2.119.2",
+    "@supabase/ssr": "0.12.7",
+    "@supabase/supabase-js": "2.119.2",
     "class-variance-authority": "0.7.1",
     "clsx": "2.1.1",
     "get-nonce": "1.0.1",
@@ -60,6 +64,7 @@
     "husky": "9.1.7",
     "jsdom": "31.0.1",
     "lint-staged": "17.6.2",
+    "otpauth": "9.6.0",
     "playwright-core": "1.63.0",
     "prettier": "3.10.1",
     "prettier-plugin-tailwindcss": "0.8.1",
@@ -71,7 +76,7 @@
   },
   "lint-staged": {
     "*.{ts,tsx,mts,mjs}": [
-      "eslint --fix --max-warnings=0",
+      "eslint --fix --max-warnings=0 --no-warn-ignored",
       "prettier --write"
     ],
     "*.{css,json,md,yml,yaml}": [

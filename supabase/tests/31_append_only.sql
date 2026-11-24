@@ -16,7 +16,7 @@ select is(
 create temp table u on commit drop as select tests.create_user('ce@example.test', 'content_editor') as ce;
 grant select on u to authenticated;
 select tests.authenticate_as((select ce from u));
-select public.log_activity('pages.update', 'page', 'x', 'Updated a page', null, null, null);
+select public.log_activity(p_action => 'pages.update', p_summary => 'Updated a page', p_entity_type => 'page', p_entity_id => 'x');
 select tests.as_system();
 select is((select actor_id from public.activity_logs where action = 'pages.update'), (select ce from u),
   'log_activity records the caller as the actor (it cannot be spoofed)');
