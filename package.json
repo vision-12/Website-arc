@@ -27,7 +27,8 @@
     "db:lint": "supabase db lint --level warning --fail-on warning",
     "db:advisors": "supabase db advisors",
     "test:db": "supabase test db",
-    "check:actions": "node scripts/check-actions.mjs"
+    "check:actions": "node scripts/check-actions.mjs",
+    "test:int": "vitest run --config vitest.integration.config.mts"
   },
   "dependencies": {
     "@supabase/postgrest-js": "2.119.2",

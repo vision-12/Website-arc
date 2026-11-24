@@ -12,18 +12,22 @@ concurrency:
   group: ci-${{ github.ref }}
   cancel-in-progress: true
 
-# Placeholder values: the build validates env shape (src/lib/env/schema.ts) but needs no real services.
 env:
-  NEXT_PUBLIC_SITE_URL: http://localhost:3100
-  NEXT_PUBLIC_SUPABASE_URL: http://127.0.0.1:54321
-  NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: sb_publishable_ci_placeholder
-  SCHOOL_SLUG: ci-school
   NEXT_TELEMETRY_DISABLED: '1'
 
 jobs:
   checks:
     name: Typecheck · lint · school values · unit
     runs-on: ubuntu-latest
+    # Placeholder values: these steps validate env shape (src/lib/env/schema.ts) but need no services.
+    env:
+      NEXT_PUBLIC_SITE_URL: http://localhost:3100
+      NEXT_PUBLIC_SUPABASE_URL: http://127.0.0.1:54321
+      NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: sb_publishable_ci_placeholder
+      SCHOOL_SLUG: ci-school
+      CRON_SECRET: ci-placeholder-cron-secret-0123456789abcdef
+      FORM_SIGNING_SECRET: ci-placeholder-form-secret-0123456789abcdef
+      IP_HASH_SALT: ci-placeholder-ip-salt-0123456789abcdef
     steps:
       - uses: actions/checkout@v5
       - uses: actions/setup-node@v5
@@ -33,6 +37,7 @@ jobs:
       - run: npm run lint
       - run: npm run format:check
       - run: npm run check:school-values
+      - run: npm run check:actions
       - run: npx vitest run --coverage
       - uses: actions/upload-artifact@v4
         if: always()
@@ -53,8 +58,8 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-  build-e2e:
-    name: Build · E2E (Playwright + axe)
+  database-e2e:
+    name: Database (pgTAP, advisors) · integration · build · E2E
     runs-on: ubuntu-latest
     needs: checks
     steps:
@@ -62,6 +67,26 @@ jobs:
       - uses: actions/setup-node@v5
         with: { node-version-file: .nvmrc, cache: npm }
       - run: npm ci
+
+      # Migrations + seed are applied on start (supabase/migrations, supabase/seed.sql).
+      - name: Start local Supabase
+        run: npx supabase start -x studio,imgproxy,edge-runtime,logflare,vector,realtime,postgres-meta,supavisor
+      - name: Export the local stack's URL and keys
+        run: node scripts/supabase-env.mjs >> "$GITHUB_ENV"
+
+      - name: Database lint (plpgsql_check)
+        run: npx supabase db lint --level warning --fail-on warning
+      - name: Supabase advisors (security + performance) must be clean
+        run: node scripts/check-advisors.mjs
+      - name: Generated types are up to date
+        run: |
+          npx supabase gen types typescript --local > "$RUNNER_TEMP/database.ts"
+          npx prettier --stdin-filepath src/types/database.ts < "$RUNNER_TEMP/database.ts" | diff -u src/types/database.ts -
+      - name: RLS / security tests (pgTAP)
+        run: npx supabase test db
+      - name: Integration tests
+        run: npm run test:int
+
       - run: npm run build
       - run: npx playwright install --with-deps chromium
       - run: npx playwright test
