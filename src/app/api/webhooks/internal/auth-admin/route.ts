@@ -90,15 +90,13 @@ export async function POST(request: NextRequest) {
     if (error) return fail(error.code ?? 'invite_failed');
     const userId = data.user.id;
     // System context (service role): the escalation check already ran when the job was created.
-    const { error: roleError } = await admin
-      .from('user_roles')
-      .insert(
-        payload.data.role_ids.map((role_id) => ({
-          user_id: userId,
-          role_id,
-          granted_by: job.requested_by,
-        })),
-      );
+    const { error: roleError } = await admin.from('user_roles').insert(
+      payload.data.role_ids.map((role_id) => ({
+        user_id: userId,
+        role_id,
+        granted_by: job.requested_by,
+      })),
+    );
     if (roleError) return fail('role_assignment_failed', 500);
     await admin
       .from('auth_admin_jobs')

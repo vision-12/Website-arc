@@ -51,13 +51,11 @@ if (roleError) {
   console.error(`Role assignment failed: ${roleError.message}`);
   process.exit(1);
 }
-await admin
-  .from('activity_logs')
-  .insert({
-    source: 'cron',
-    action: 'users.bootstrap_super_admin',
-    entity_type: 'profile',
-    entity_id: data.user.id,
-    summary: 'Invited the first Super Administrator',
-  });
+await admin.from('activity_logs').insert({
+  source: 'cron',
+  action: 'users.bootstrap_super_admin',
+  entity_type: 'profile',
+  entity_id: data.user.id,
+  summary: 'Invited the first Super Administrator',
+});
 console.log(`Invitation sent to ${values.email}. They must accept it and set up two-step sign-in.`);
