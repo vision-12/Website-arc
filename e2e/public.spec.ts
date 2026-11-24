@@ -1,3 +1,4 @@
+import { adminClient } from '../test/support/supabase';
 import { expect, expectAxeClean, screenshot, test } from './fixtures';
 
 test.describe('public site shell', () => {
@@ -44,10 +45,24 @@ test.describe('public site shell', () => {
     expect(await res.text()).toMatch(/Disallow: \//);
   });
 
-  test('theme stylesheet is versioned and immutable', async ({ request }) => {
-    const res = await request.get('/theme.css?v=0');
-    expect(res.headers()['content-type']).toContain('text/css');
-    expect(res.headers()['cache-control']).toContain('immutable');
-    expect(await res.text()).toContain('--brand-primary:');
+  test('theme stylesheet is versioned and immutable', async ({ page, request }) => {
+    await page.goto('/');
+    const href = await page
+      .locator('link[rel=stylesheet][href^="/theme.css?v="]')
+      .getAttribute('href');
+    expect(href).toMatch(/^\/theme\.css\?v=\d+$/);
+
+    // The current settings version is cached for a year; any other version must revalidate.
+    const { data } = await adminClient()
+      .from('site_settings')
+      .select('version')
+      .eq('id', 1)
+      .single();
+    const current = await request.get(`/theme.css?v=${data!.version}`);
+    expect(current.headers()['content-type']).toContain('text/css');
+    expect(current.headers()['cache-control']).toContain('immutable');
+    expect(await current.text()).toContain('--brand-primary:');
+    const stale = await request.get(`/theme.css?v=${data!.version + 1000}`);
+    expect(stale.headers()['cache-control']).toBe('public, max-age=0, must-revalidate');
   });
 });

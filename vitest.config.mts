@@ -14,6 +14,7 @@ export default defineConfig({
   test: {
     environment: 'node',
     include: ['src/**/*.test.{ts,tsx}', 'scripts/**/*.test.{ts,mjs}'],
+    exclude: ['**/*.int.test.ts', '**/node_modules/**'],
     coverage: {
       provider: 'v8',
       include: [
@@ -28,7 +29,15 @@ export default defineConfig({
         'src/lib/fonts/fonts.ts',
         'src/lib/env/public.ts',
         'src/lib/dates/current-year.ts',
+        // Thin Supabase client wiring: exercised against a real database by the integration and E2E suites.
+        'src/lib/supabase/**',
+        // CLIs: check-audit shells out to npm; check-actions is tested as a subprocess; bootstrap is an ops script.
         'scripts/check-audit.mjs',
+        'scripts/check-actions.mjs',
+        'scripts/bootstrap-super-admin.mjs',
+        // Shell out to the Supabase CLI; exercised by the CI database job itself.
+        'scripts/supabase-env.mjs',
+        'scripts/check-advisors.mjs',
         '**/__tests__/**',
       ],
       thresholds: { lines: 90, functions: 90, branches: 80, statements: 90 },

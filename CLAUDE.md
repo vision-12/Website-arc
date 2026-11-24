@@ -10,7 +10,9 @@ Next.js 16 App Router · React 19 · TypeScript strict · Tailwind v4 (`@theme i
 
 - `npm run dev` · `npm run build` · `npm run typecheck` · `npm run lint`
 - `npm run test` (Vitest) · `npm run e2e` (Playwright) · `npm run test:db` (pgTAP via `supabase test db`)
-- `npx supabase migration new <name>` · `npx supabase db reset` (local) · `npm run db:types` (regenerate `src/types/database.ts`)
+- `npm run db:start` (local Supabase via GHCR) · `npm run db:reset` · `npx supabase migration new <name>` · `npm run db:types` (regenerate `src/types/database.ts`)
+- `npm run test:int` (integration, needs the local stack) · `npm run check:actions` · `node scripts/check-advisors.mjs` · `node scripts/supabase-env.mjs` (env for the local stack)
+- Local setup and seeded accounts: `docs/runbooks/local-dev.md`
 
 ## Hard rules (never break)
 
@@ -59,3 +61,11 @@ Next.js 16 App Router · React 19 · TypeScript strict · Tailwind v4 (`@theme i
 - Typed routes: `href`s must be real routes (`import type { Route } from 'next'`), not template strings.
 - `next/font` options must be literal objects at each call site (no spreading of shared options).
 - Pins: React 19.2.x (MP), TypeScript 5.9 (typescript-eslint `<6.1`), Playwright and `playwright-core` 1.63 (pre-installed browser). Renovate enforces them.
+- User-scoped Supabase client awaits `connection()` (request-time only); the cached public client is PostgREST-only (`createPublicClient`). See ADR-000 amendment.
+- Forms: submit buttons stay disabled until hydration (`useHydrated`). A pre-hydration Server Action submit on a PPR route returns only the streamed holes (blank page). Never render a form inside a streaming `<Suspense>`; read query params in the browser (`useSearchParam`). Public forms work the same way, plus a `<noscript>` notice built from `site_settings` (ADR-015).
+- A form's `action` must be the Server Action itself. Validate in the browser in `onSubmit` (`useClientCheck`, same Zod schema); a client-function `action` makes React inline a form-replay script that has no nonce (CSP violation).
+- The previous route stays mounted (hidden) after navigation: don't reuse element IDs across shells, and query by role in E2E (hidden content is ignored).
+- RLS guards treat `auth.role() in (anon, authenticated)` as end users; migrations, seeds and the service role are "system". Our own definer RPCs that must write guarded columns set the transaction-local `app.trusted_rpc` flag around one statement.
+- pgTAP: `supabase/tests/000_setup_helpers.sql` installs helpers (`tests.create_user`, `tests.authenticate_as`, …) and commits; every other file runs in a rolled-back transaction. Security tests are written first, then shown failing.
+- Supabase Auth sees the app server's IP for every sign-in, so its per-IP limits are school-wide; keep them generous (ADR-008) — the app limiter is the real throttle.
+- E2E: give each test its own `x-forwarded-for` (`uniqueIp`) so the per-IP login limit doesn't trip on the shared localhost IP.

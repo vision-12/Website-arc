@@ -1,0 +1,26 @@
+Target: local stack (127.0.0.1:54322)
+psql:/home/user/website-arc/supabase/tests/000_setup_helpers.sql:4: NOTICE:  schema "tests" already exists, skipping
+/home/user/website-arc/supabase/tests/000_setup_helpers.sql ....... ok
+/home/user/website-arc/supabase/tests/00_rls_enabled.sql .......... ok
+/home/user/website-arc/supabase/tests/01_policy_uid_initplan.sql .. ok
+/home/user/website-arc/supabase/tests/02_definer_search_path.sql .. ok
+/home/user/website-arc/supabase/tests/03_policy_text.sql .......... ok
+/home/user/website-arc/supabase/tests/10_anon_reads.sql ........... ok
+/home/user/website-arc/supabase/tests/11_anon_writes.sql .......... ok
+/home/user/website-arc/supabase/tests/20_role_isolation.sql ....... ok
+/home/user/website-arc/supabase/tests/21_deactivated.sql .......... ok
+/home/user/website-arc/supabase/tests/22_escalation.sql ........... ok
+/home/user/website-arc/supabase/tests/23_mfa.sql .................. ok
+/home/user/website-arc/supabase/tests/24_support_access.sql ....... ok
+/home/user/website-arc/supabase/tests/30_lifecycle.sql ............ ok
+/home/user/website-arc/supabase/tests/31_append_only.sql .......... ok
+/home/user/website-arc/supabase/tests/40_submit_application.sql ... 
+# Failed (TODO) test 1: "submit_application rejects a client-supplied status"
+# Failed (TODO) test 2: "submit_application rejects a client-supplied reference"
+ok
+/home/user/website-arc/supabase/tests/41_reference.sql ............ ok
+/home/user/website-arc/supabase/tests/44_storage_staff.sql ........ ok
+/home/user/website-arc/supabase/tests/45_auth_admin_jobs.sql ...... ok
+All tests successful.
+Files=18, Tests=118,  2 wallclock secs ( 0.05 usr  0.02 sys +  0.12 cusr  0.05 csys =  0.24 CPU)
+Result: PASS

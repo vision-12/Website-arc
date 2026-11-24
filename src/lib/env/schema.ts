@@ -45,10 +45,10 @@ export const serverEnvSchema = z.object({
   EMAIL_FROM: z.string().optional(), // phase 11
   EMAIL_ADMISSIONS_INBOX: z.email().optional(), // phase 12
   RESEND_WEBHOOK_SECRET: z.string().optional(), // phase 14
-  CRON_SECRET: secret().optional(), // phase 4
+  CRON_SECRET: secret(), // phase 2: also authenticates internal job calls (spec D13)
   PREVIEW_TOKEN_SECRET: secret().optional(), // phase 4
-  FORM_SIGNING_SECRET: secret().optional(), // phase 2 (spec D5)
-  IP_HASH_SALT: secret().optional(), // phase 2 (spec D10)
+  FORM_SIGNING_SECRET: secret(), // spec D5; must equal Vault secret form_signing_secret
+  IP_HASH_SALT: secret(), // spec D10
   SENTRY_DSN: z.url().optional(),
 });
 

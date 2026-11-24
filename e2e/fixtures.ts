@@ -5,6 +5,9 @@ export const WCAG_TAGS = ['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa', 'wcag22aa'
 
 /** Every page must pass axe with zero violations (MP §10). */
 export async function expectAxeClean(page: Page) {
+  // The title is streamed metadata. When a Server Action sets a cookie, Next refreshes the route
+  // and the <title> is briefly replaced, so wait for it (a page with no title still fails here).
+  await expect(page, 'page title').toHaveTitle(/\S/);
   const results = await new AxeBuilder({ page }).withTags(WCAG_TAGS).analyze();
   const summary = results.violations.map(
     (v) => `${v.id}: ${v.help} (${v.nodes.map((n) => n.target.join(' ')).join(', ')})`,

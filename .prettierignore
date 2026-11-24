@@ -9,3 +9,6 @@ test-results
 .husky
 test-results
 public
+# Third-party agent skills (supabase/agent-skills): kept byte-for-byte as installed
+.claude/skills
+skills-lock.json

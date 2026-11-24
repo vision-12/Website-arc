@@ -1,4 +1,8 @@
+import { existsSync } from 'node:fs';
 import { defineConfig, devices } from '@playwright/test';
+
+// Local runs read the same env as `next start`; CI provides variables directly.
+if (existsSync('.env.local')) process.loadEnvFile('.env.local');
 
 const PORT = Number(process.env.E2E_PORT ?? 3100);
 

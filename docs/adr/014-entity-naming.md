@@ -1,0 +1,14 @@
+# ADR-014 — PRD §9.3 entity names → schema table names
+
+- **Status:** Accepted (Phase 2).
+
+PRD §9.3 lists suggested core entities and says "the exact schema should be finalised before implementation". The approved spec (§1) uses these names:
+
+| PRD §9.3              | Table(s)                                                                                                      | Why                                                                                                                                                                                                                                                                                    |
+| --------------------- | ------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `admissions`          | `applications` (+ `admission_intakes`, `admission_forms`, `admission_form_versions`, `admission_statuses`, …) | "admissions" is the module; one row is one application                                                                                                                                                                                                                                 |
+| `admission_documents` | `application_documents`                                                                                       | belongs to an application                                                                                                                                                                                                                                                              |
+| `gallery_media`       | `gallery_items`                                                                                               | items can be photos **or** embedded videos that are not media-library assets                                                                                                                                                                                                           |
+| everything else       | unchanged                                                                                                     | `profiles`, `roles`, `permissions`, `role_permissions`, `pages`, `news_articles`, `news_categories`, `academic_programmes`, `departments`, `subjects`, `events`, `gallery_albums`, `staff_profiles`, `resources`, `contact_messages`, `media_assets`, `site_settings`, `activity_logs` |
+
+The module and permission keys stay as in the PRD (`admissions.*`, `gallery.*`).

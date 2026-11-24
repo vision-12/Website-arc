@@ -1,0 +1,13 @@
+create type public.content_status as enum ('draft', 'in_review', 'scheduled', 'published', 'archived');
+create type public.profile_status as enum ('invited', 'active', 'deactivated');
+create type public.enquiry_status as enum ('new', 'read', 'replied', 'archived');
+create type public.page_layout as enum ('default', 'wide', 'with_sidebar');
+create type public.media_kind as enum ('image', 'document');
+create type public.curriculum as enum ('UNEB', 'Cambridge', 'IB', 'Other');
+create type public.video_provider as enum ('youtube', 'vimeo');
+create type public.gallery_item_kind as enum ('image', 'video');
+create type public.upload_state as enum ('pending', 'uploaded', 'rejected', 'expired');
+create type public.document_review as enum ('unreviewed', 'accepted', 'rejected');
+create type public.email_status as enum ('queued', 'sending', 'sent', 'delivered', 'bounced', 'complained', 'failed', 'suppressed');
+create type public.redirect_source as enum ('slug_change', 'import', 'manual');
+create type public.log_source as enum ('app', 'db', 'cron');
