@@ -31,4 +31,4 @@ The open questions in spec §9 were not individually answered. Each one therefor
 | Q23 video | Embed-only | Phase 9 |
 | Q24 media documents | PDF only | Phase 4 |
 | Q25 announcement emails | v2 | — |
-| Q26 public forms without JavaScript | **Proposed in ADR-015:** JavaScript required for both public forms, with a `<noscript>` notice giving the school's phone and email (contact) or the paper route (admissions). A no-JS contact path was considered and not recommended: it can't run BotID or Turnstile, so bots would use it | Phase 11 |
+| Q26 public forms without JavaScript | **Decided 24 Nov 2026 (ADR-015):** JavaScript required for both public forms, with a `<noscript>` notice giving the school's phone and email (contact) or the paper route (admissions). A no-JS contact path was considered and not recommended: it can't run BotID or Turnstile, so bots would use it | Confirmed |

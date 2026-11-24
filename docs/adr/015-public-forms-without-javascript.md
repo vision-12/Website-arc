@@ -1,6 +1,6 @@
 # ADR-015 — Public forms without JavaScript (Q26)
 
-- **Status:** **Proposed**, awaiting Altrastate's decision. It must be decided before Phase 11 (contact) and Phase 12 (admissions).
+- **Status:** **Accepted** (24 Nov 2026). Altrastate chose option 1.
 - **Context:** open question Q26; ADR-000 amendment, items 3 and 8; spec §4.5 (`contact.submit`), §4.6 and §5.3 (admissions form), D5 (submission tickets), Q1 (BotID / Turnstile), Q9 (paper applications); MP §1 (primary device: mid-range Android on 3G/4G).
 
 ## Context
@@ -26,11 +26,11 @@ Public submissions are protected in layers (spec §4.5, D5, ADR-008): BotID (Tur
    - **Cost:** that path can't run BotID or Turnstile, so bots would use it to skip the bot check. Only the honeypot, the time check and the rate limits would stop them.
    - It also needs its own same-origin check, and its own way to show errors without JavaScript.
 
-## Recommendation
+## Decision
 
-**Option 1.** Option 2 helps visitors whose browsers run no JavaScript at all, but they can already phone or email from the same page. In exchange it would open a bot path into the school's enquiry inbox. Mid-range Android phones, the primary device (MP §1), run JavaScript.
+**Option 1: both public forms require JavaScript.** Option 2 would help visitors whose browsers run no JavaScript at all, but they can already phone or email from the same page. In exchange it would have opened a bot path into the school's enquiry inbox. Mid-range Android phones, the primary device (MP §1), run JavaScript.
 
-## If accepted
+## Consequences
 
 - Phase 11 and Phase 12 forms follow the admin pattern:
   - submit disabled until hydration

@@ -185,10 +185,10 @@ Evidence lives in `docs/plan/evidence/phase-02/`.
 - **Deferred to the phase that first needs them.** `definePublicAction` (Phase 11, the first public form); the TypeScript mirror of the reference checksum (Phase 12, the tracking page; the SQL generator is covered by `41_reference`); the `resend_invite` job (Phase 13, the users screen).
 - **Stricter than planned.** Roles that require MFA are sent to set-up before they reach the admin area, instead of seeing a nudge (P2-E). Changing your password works through an emailed reset link (`secure_password_change`), not an in-page form.
 - **CI.** One `database-e2e` job: E2E needs the same local stack, so it starts once. The pre-commit hook now stops on the first failure and runs gitleaks locally.
-- **Docs.** ADR-003, 006, 007, 008 and 014 are written, and ADR-000 has a Phase 2 amendment with eight findings. ADR-002 (one deployment per school), due in Phase 1, is written now, and ADR-015 proposes the answer to Q26. ADR-004 (anon upload slots) moves to Phase 12c with the policies it describes. ADR-012 (reference algorithm) stays in Phase 12a, as the spec maps it.
+- **Docs.** ADR-003, 006, 007, 008 and 014 are written, and ADR-000 has a Phase 2 amendment with eight findings. ADR-002 (one deployment per school), due in Phase 1, is written now, and ADR-015 records the Q26 decision. ADR-004 (anon upload slots) moves to Phase 12c with the policies it describes. ADR-012 (reference algorithm) stays in Phase 12a, as the spec maps it.
 - **Rate limits.** Supabase Auth's own per-IP limits are raised to a generous backstop, because Auth sees the app server's IP for every sign-in. The app limiter is the real throttle (ADR-008).
 
 ### Known limitations (documented, not defects)
 
 - `forbidden()` keeps HTTP 200 on partially prerendered admin routes; the content is withheld (ADR-000 amendment, item 7).
-- Forms need JavaScript. This is fine for the admin area; the public forms decide before Phase 11 (Q26, proposed in ADR-015).
+- Forms need JavaScript. The public forms will need it too, with a `<noscript>` notice (Q26, decided in ADR-015).
