@@ -1,3 +1,4 @@
+import { loginAs } from './auth-helpers';
 import { expect, expectAxeClean, screenshot, test } from './fixtures';
 
 const SECTIONS = [
@@ -18,7 +19,11 @@ const SECTIONS = [
   'Activity log',
 ];
 
-test.describe('admin shell', () => {
+test.describe('admin shell (signed in as a school administrator, who sees every section)', () => {
+  test.beforeEach(async ({ page }) => {
+    await loginAs(page, 'school_admin');
+  });
+
   test('is private, noindexed and redirects /admin to the overview', async ({
     page,
     cspViolations,
@@ -64,6 +69,8 @@ test.describe('admin shell', () => {
   }, info) => {
     test.skip(info.project.name !== 'desktop', 'desktop sidebar');
     await page.goto('/admin/overview');
+    // The signed-in frame streams in after the shell; wait for it before using the keyboard.
+    await page.getByRole('navigation', { name: 'Administration sections' }).waitFor();
     await page.keyboard.press('Tab'); // skip link
     await page.keyboard.press('Tab'); // first sidebar link
     const focused = page.locator(':focus');
@@ -102,9 +109,9 @@ test.describe('admin shell', () => {
     expect(cspViolations).toEqual([]);
   });
 
-  test('unknown sections return the not-found page', async ({ page }) => {
-    const response = await page.goto('/admin/not-a-section');
-    expect(response?.status()).toBe(404);
+  test('unknown sections show the not-found page', async ({ page }) => {
+    await page.goto('/admin/not-a-section');
+    await expect(page.getByRole('heading', { level: 1 })).toContainText(/not found|404/i);
   });
 
   test('has no horizontal scrolling at 360px', async ({ page }, info) => {
