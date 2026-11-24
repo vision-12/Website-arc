@@ -139,3 +139,35 @@ Test Summary Report
   Failed tests:  1-2
 Files=18, Tests=118,  2 wallclock secs ( 0.08 usr  0.03 sys +  0.15 cusr  0.07 csys =  0.33 CPU)
 Result: FAIL
+
+# ── Added at the end of Phase 2: 32_audit_trail.sql (role, permission and status changes are audited)
+# The test was written after the triggers, so it is proven by mutation instead: a copy that drops the three
+# audit triggers inside its own (rolled-back) transaction must fail every assertion.
+#   drop trigger user_roles_audit on public.user_roles;
+#   drop trigger role_permissions_audit on public.role_permissions;
+#   drop trigger profiles_status_audit on public.profiles;
+
+supabase/tests/32_audit_trail_mutant.sql .. 
+# Failed test 1: "granting a role is audited: who did it, to whom, which role"
+#         have: 0
+#         want: 1
+# Failed test 2: "removing a role is audited"
+#         have: 0
+#         want: 1
+# Failed test 3: "deactivating an account is audited with the old and new status"
+#         have: NULL
+#         want: {"to": "deactivated", "from": "active"}
+# Failed test 4: "adding a permission to a role is audited"
+#         have: 0
+#         want: 1
+# Looks like you failed 4 tests of 4
+Failed 4/4 subtests 
+
+Test Summary Report
+-------------------
+supabase/tests/32_audit_trail_mutant.sql (Wstat: 0 Tests: 4 Failed: 4)
+  Failed tests:  1-4
+Files=1, Tests=4,  0 wallclock secs ( 0.01 usr +  0.01 sys =  0.02 CPU)
+Result: FAIL
+
+# Unmodified file, full suite: Files=20, Tests=132, Result: PASS

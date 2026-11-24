@@ -48,3 +48,17 @@
 ## Decision 3 — Admin area exposure before authentication (P1-C)
 
 Until Phase 2 adds authentication, `proxy.ts` returns 404 for `/admin/*` when `VERCEL_ENV === 'production'`. This is unit-tested, and Phase 2 removes it.
+
+## Amendment — Phase 2 findings (24 Nov 2026)
+
+Measured while building authentication. Each item has a test that fails if it regresses.
+
+1. **User-scoped Supabase client is request-time only.** Under Cache Components, `cookies()` is "runtime data" that Next may still prerender (runtime prefetch). The supabase-js auth client reads the clock on start-up, which Next refuses during prerendering. `createClient()` therefore awaits `connection()` first. User data must never be prerendered anyway (MP §2.5).
+2. **The public (cached) client is PostgREST only.** The full supabase-js client starts background auth timers that outlive a `'use cache'` scope. `createPublicClient()` is a plain `PostgrestClient` with the publishable key.
+3. **Forms are disabled until hydration.** On partially prerendered routes, a Server Action submitted _before_ React hydrates is handled as a native form post. The response contains only the streamed dynamic segments: no page shell and no form state. The visitor sees a blank or broken page. Every submit button is disabled until `useHydrated()` is true (`src/hooks/use-hydrated.ts`); e2e "cannot be submitted before the page is ready" holds the JS back to prove it.
+   - **Consequence for the public site:** with JavaScript fully disabled, forms cannot be used. This is acceptable for the admin area. The public contact and admissions forms (Phases 11–12) must decide their no-JS behaviour explicitly; this is open question **Q26**.
+4. **Never put a form inside a `<Suspense>` that streams.** The prerendered fallback form is replaced when the real one streams in, wiping anything typed meanwhile. Pages render forms once and read query parameters in the browser (`useSearchParam`).
+5. **Nonce for runtime-injected styles comes from inline scripts only.** The client runtime later inserts external chunk scripts that can carry a stale nonce (harmless to them under `'self'`). `StyleNonce` reads `script[nonce]:not([src])`.
+6. **Hidden previous pages stay mounted.** Next keeps the previous route mounted, hidden, for instant back navigation. IDs must not collide across shells: the auth screens use `#auth-main`, the admin and public shells `#main-content`. Tests use role-based queries, which ignore hidden content.
+7. **`forbidden()` status.** On partially prerendered admin routes, the shell has already streamed with 200 by the time a section's permission check runs. The section's content is withheld and replaced by the "no access" view, but the HTTP status stays 200. Authorisation does not depend on the status code; RLS and `requirePermission` are the boundary.
+8. **A form's `action` stays a Server Action.** If `action` is a client function (for example a wrapper that validates first), React can't render the form progressively enhanced. It adds an inline form-replay script instead, and that script has no nonce in a prerendered shell, so the CSP blocks it. Browser-side checks run in `onSubmit` and cancel the submit when the input is invalid (`useClientCheck`); the E2E CSP guard caught this.

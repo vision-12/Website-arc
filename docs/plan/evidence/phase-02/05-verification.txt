@@ -1,0 +1,77 @@
+## Static checks
+typecheck: PASS
+lint: PASS
+format: PASS
+check-school-values: no school-specific values in src/
+check-actions: every feature action goes through defineAction/defineUserAction
+npm audit gate passed (0 lower-severity advisories outside the RSC stack).
+
+## Unit tests (Vitest + coverage)
+ Test Files  25 passed (25)
+      Tests  127 passed (127)
+All files          |    94.5 |    88.44 |     100 |   94.59 |                   
+
+## Database (fresh reset)
+Finished supabase db reset on branch feat/phase-02-database.
+{"results":[],"message":"db lint","target":{"kind":"local","host":"127.0.0.1","port":54322}}
+Supabase advisors: no findings.
+generated types: up to date
+Files=20, Tests=132,  2 wallclock secs (re-run after adding 32_audit_trail.sql; 40_submit_application is a planned TODO for Phase 12a)
+Result: PASS
+
+## Integration tests
+ Test Files  2 passed (2)
+      Tests  9 passed (9)
+## Build
+✓ Compiled successfully in 6.1s
+Route (app)                            Revalidate  Expire
+┌ ◐ /                                          1h      1d
+├ ◐ /_not-found                                1h      1d
+├ ◐ /accept-invite                             1h      1d
+├ ◐ /admin                                     1h      1d
+├ ◐ /admin/academics                           1h      1d
+├ ◐ /admin/account                             1h      1d
+├ ◐ /admin/activity                            1h      1d
+├ ◐ /admin/admissions                          1h      1d
+├ ◐ /admin/appearance                          1h      1d
+├ ◐ /admin/enquiries                           1h      1d
+├ ◐ /admin/events                              1h      1d
+├ ◐ /admin/gallery                             1h      1d
+├ ◐ /admin/media                               1h      1d
+├ ◐ /admin/news                                1h      1d
+├ ◐ /admin/overview                            1h      1d
+├ ◐ /admin/pages                               1h      1d
+├ ◐ /admin/resources                           1h      1d
+├ ◐ /admin/settings                            1h      1d
+├ ◐ /admin/staff                               1h      1d
+├ ◐ /admin/users                               1h      1d
+├ ƒ /api/webhooks/internal/auth-admin
+├ ƒ /auth/confirm
+├ ƒ /auth/signout
+├ ◐ /forgot-password                           1h      1d
+├ ◐ /login                                     1h      1d
+├ ◐ /mfa                                       1h      1d
+├ ◐ /mfa/setup                                 1h      1d
+├ ◐ /reset-password                            1h      1d
+├ ○ /robots.txt                                1h      1d
+└ ƒ /theme.css
+
+
+ƒ Proxy (Middleware)
+
+○  (Static)             prerendered as static content
+◐  (Partial Prerender)  prerendered as static HTML with dynamic server-streamed content
+ƒ  (Dynamic)            server-rendered on demand
+(Every page route is ◐: prerendered shell + per-request dynamic hole, so inline scripts get the CSP nonce. /robots.txt is a metadata route with no scripts.)
+
+## E2E (Playwright + axe, desktop 1280 · 360 px · Pixel 7)
+  19 skipped
+  71 passed (59.6s)
+(The 19 skips are by design: each layout check runs only at the viewport it applies to.
+Desktop-sidebar and per-role sidebar checks run at 1280 px; drawer checks run below
+1024 px; the no-horizontal-scroll check runs at 360 px.)
+
+## Screenshots (docs/plan/evidence/phase-02/screenshots/, 1280 px and 360 px, DPR 2)
+login, mfa-setup, accept-invite, account, admin-overview, admin-drawer (360 px), public-home.
+Names and addresses in them belong to throwaway E2E users on the local stack; the
+setup key in mfa-setup belongs to one of those users and is not a secret.

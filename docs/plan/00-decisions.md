@@ -31,3 +31,4 @@ The open questions in spec §9 were not individually answered. Each one therefor
 | Q23 video | Embed-only | Phase 9 |
 | Q24 media documents | PDF only | Phase 4 |
 | Q25 announcement emails | v2 | — |
+| Q26 public forms without JavaScript | Proposed: JavaScript required — forms stay disabled until the page has loaded, because a pre-hydration submit returns a broken page (ADR-000 amendment, Phase 2). Alternative: a no-JS fallback page | Phase 11 |

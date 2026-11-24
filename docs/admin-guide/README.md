@@ -15,4 +15,4 @@ Plain-language guides for school staff (PRD §17.1). Each "?" help link in the a
 | Managing contact information | `contact.md`    | Phase 11       |
 | Managing authorised users    | `users.md`      | Phase 13       |
 
-Phase 1 delivered the administration shell only (navigation, layout). There are no tasks for school staff yet, so there are no guide pages yet.
+Phase 2 added signing in, invitations, two-step sign-in and the account page.

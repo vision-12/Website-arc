@@ -1,6 +1,6 @@
 # Phase 2 — Database, auth, RBAC & security foundation (plan)
 
-**Status:** awaiting approval. Nothing in this file has been built yet.
+**Status:** **Built**, awaiting review (24 Nov 2026). Approved with "Go" on P2-A … P2-E. What changed against this plan, and the Definition of Done evidence, are in §10 at the end.
 **Inputs:**
 - MASTER_PROMPT §2.3–2.5, §6, §7 and §12 (Phase 2 prompt)
 - Spec §1, §2, §3, §4.0, §4.4, §4.7, §4.8 and §8.2
@@ -155,3 +155,40 @@ Every MP §12 item applies this phase, so each one is reported with command outp
 - content module UIs (Phase 4+)
 - `submit_enquiry` / `submit_application` RPCs (Phases 11 and 12)
 - the anon upload-slot storage policies (Phase 12c)
+
+## 10. Outcome (24 Nov 2026)
+
+### Definition of Done (MP §12), item by item
+
+Evidence lives in `docs/plan/evidence/phase-02/`.
+
+| Item | Result | Evidence |
+|---|---|---|
+| Migrations committed and applied cleanly to a fresh DB | ✅ 15 migrations; `supabase db reset` from empty, then `db lint` clean, advisors clean (security + performance) and generated types up to date | `05-verification.txt`, `04-advisors.json` |
+| RLS + pgTAP tests pass | ✅ 20 files, 132 assertions. Red before the migrations, green after; deliberately weakened policies and triggers are caught | `01-red-before-migrations.txt`, `02-green-after-migrations.txt`, `03-mutation-check.txt` |
+| Zod schemas shared client/server | ✅ each sign-in form checks its input in the browser with its action's own schema before sending (`useClientCheck`), and the action validates again | `src/features/auth/__tests__/`; E2E "mistakes are caught in the browser … before anything is sent" proves no request is made |
+| Every action calls `requirePermission` | ✅ every export of `features/**/actions.ts` must be `defineAction` (permission key) or `defineUserAction` (own account); `npm run check:actions` runs in CI | `05-verification.txt` |
+| Unit + integration tests pass | ✅ unit 127/127 (94.5 % statements, 100 % functions); integration 9/9 against the local stack | `05-verification.txt` |
+| Playwright E2E incl. axe | ✅ 71 passed, 19 skipped by design (viewport-specific checks), every page axe-clean and CSP-clean, at 1280 px, 360 px and Pixel 7 | `05-verification.txt`, `screenshots/` |
+| typecheck, lint, build clean | ✅ every page route is ◐ (prerendered shell with a dynamic hole) | `05-verification.txt` |
+| Audit log entries written | ✅ sign-in (`25_session_rpcs`), repeated failed sign-ins (`tickets.int`), invites (`auth-admin.int`), role, permission and status changes (`32_audit_trail`) | test files |
+| Admin-guide page | ✅ `docs/admin-guide/logging-in.md` | |
+| `progress.md` updated | ✅ | |
+| No TODOs without an issue link | ✅ the only one is the planned `submit_application` pgTAP todo (P2-A), tracked in [issue #3](https://github.com/vision-12/Website-arc/issues/3) | |
+
+### Changes against this plan
+
+- **Two extra migrations.** `14_reference_data` holds the roles, permissions, role matrix and admission statuses, so production gets them from `db push`; this replaces the planned `supabase/seed/production.sql`. `15_session_rpcs` adds `my_access()`, `record_login()`, `accept_invite()` and the service-only `revoke_user_sessions()` and `user_has_permission()`, with one permission rule (`private.permission_check`) behind every check.
+- **Two extra pgTAP files.** `25_session_rpcs` and `32_audit_trail`. The audit test was written after its triggers, so it is proven by mutation instead of a red run (`03-mutation-check.txt`).
+- **File names.** `require-permission.ts` became `src/lib/auth/access.ts`. The bootstrap script is `scripts/bootstrap-super-admin.mjs` (plain Node, no build step). There is no separate `rate-limit.ts`: the login action calls `rate_limit_check_auth` directly (ADR-008).
+- **Action check.** "Every action calls `requirePermission`" is enforced by `scripts/check-actions.mjs` (unit-tested, in CI) rather than an ESLint rule.
+- **Deferred to the phase that first needs them.** `definePublicAction` (Phase 11, the first public form); the TypeScript mirror of the reference checksum (Phase 12, the tracking page; the SQL generator is covered by `41_reference`); the `resend_invite` job (Phase 13, the users screen).
+- **Stricter than planned.** Roles that require MFA are sent to set-up before they reach the admin area, instead of seeing a nudge (P2-E). Changing your password works through an emailed reset link (`secure_password_change`), not an in-page form.
+- **CI.** One `database-e2e` job: E2E needs the same local stack, so it starts once. The pre-commit hook now stops on the first failure and runs gitleaks locally.
+- **Docs.** ADR-003, 006, 007, 008 and 014 are written, and ADR-000 has a Phase 2 amendment with eight findings. ADR-004 (anon upload slots) moves to Phase 12c with the policies it describes. ADR-012 (reference algorithm) stays in Phase 12a, as the spec maps it.
+- **Rate limits.** Supabase Auth's own per-IP limits are raised to a generous backstop, because Auth sees the app server's IP for every sign-in. The app limiter is the real throttle (ADR-008).
+
+### Known limitations (documented, not defects)
+
+- `forbidden()` keeps HTTP 200 on partially prerendered admin routes; the content is withheld (ADR-000 amendment, item 7).
+- Forms need JavaScript. This is fine for the admin area; the public forms decide in Phase 11 (Q26).
