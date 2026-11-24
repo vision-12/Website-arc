@@ -9,7 +9,10 @@ import { setNonce } from 'get-nonce';
  * This keeps the layout free of request data, so public pages keep their prerendered shell.
  */
 if (typeof document !== 'undefined') {
-  const nonce = document.querySelector<HTMLScriptElement>('script[nonce]')?.nonce;
+  // Inline scripts only: they come from the server response and carry this document's nonce.
+  // External chunk scripts inserted later by the client runtime can carry a stale nonce (harmless
+  // for them, since 'self' allows them) and must not be used.
+  const nonce = document.querySelector<HTMLScriptElement>('script[nonce]:not([src])')?.nonce;
   if (nonce) setNonce(nonce);
 }
 

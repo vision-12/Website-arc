@@ -5,6 +5,7 @@ import { CircleAlert, CircleCheck, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { useHydrated } from '@/hooks/use-hydrated';
 import type { FormState } from '../schema';
 
 /** Form-level message. Errors move focus here and are announced (WCAG 3.3.1, MP §10). */
@@ -90,8 +91,11 @@ export function SubmitButton({
   pendingLabel: string;
 }) {
   const { pending } = useFormStatus();
+  const hydrated = useHydrated();
+  // Disabled until hydrated: see useHydrated() for why a pre-hydration submit is unsafe.
+  const disabled = pending || !hydrated;
   return (
-    <Button type="submit" className="w-full" disabled={pending} aria-disabled={pending}>
+    <Button type="submit" className="w-full" disabled={disabled} aria-disabled={disabled}>
       {pending ? (
         <>
           <Loader2 className="animate-spin" aria-hidden="true" />

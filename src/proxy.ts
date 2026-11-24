@@ -12,7 +12,7 @@ export async function proxy(request: NextRequest) {
   const nonce = createNonce();
   const csp = buildCsp({
     nonce,
-    supabaseUrl: process.env.NEXT_PUBLIC_SUPABASE_URL ?? 'http://127.0.0.1:54321',
+    supabaseUrl: process.env.NEXT_PUBLIC_SUPABASE_URL || 'http://127.0.0.1:54321',
     isDev: process.env.NODE_ENV === 'development',
   });
 

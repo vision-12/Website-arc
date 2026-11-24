@@ -1,13 +1,16 @@
 'use client';
 import { useActionState, useEffect, useState } from 'react';
 import { confirmMfaEnrolment, startMfaEnrolment, type EnrolmentStart } from '../actions';
-import { IDLE } from '../schema';
+import { IDLE, MfaEnrolConfirmInput } from '../schema';
 import { Field, FormMessage, SubmitButton } from './form-parts';
+import { useClientCheck } from './use-client-check';
 
 /** TOTP enrolment: QR code (with the key written out for those who can't scan), then a code to confirm. */
 export function MfaSetup({ next }: { next: string }) {
   const [enrolment, setEnrolment] = useState<EnrolmentStart | null>(null);
-  const [state, action] = useActionState(confirmMfaEnrolment, IDLE);
+  const [serverState, action] = useActionState(confirmMfaEnrolment, IDLE);
+  const { clientState, onSubmit } = useClientCheck(MfaEnrolConfirmInput);
+  const state = clientState ?? serverState;
 
   useEffect(() => {
     let cancelled = false;
@@ -65,7 +68,7 @@ export function MfaSetup({ next }: { next: string }) {
           {enrolment.secret}
         </p>
       </div>
-      <form action={action} className="space-y-4" noValidate>
+      <form action={action} onSubmit={onSubmit} className="space-y-4" noValidate>
         <FormMessage state={state} />
         <input type="hidden" name="factorId" value={enrolment.factorId} />
         <input type="hidden" name="next" value={next} />

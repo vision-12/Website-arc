@@ -13,7 +13,8 @@ export async function AuthShell({
   const { settings } = await getSiteSettings();
   return (
     <div className="admin-scope flex min-h-dvh flex-col items-center justify-center bg-background px-4 py-10">
-      <main id="main-content" className="w-full max-w-md">
+      {/* Own id: Next keeps the previous page mounted (hidden) after navigating into the admin area. */}
+      <main id="auth-main" className="w-full max-w-md">
         <div className="mb-6 text-center">
           <p className="text-xs font-medium tracking-wide text-muted-foreground uppercase">
             Altrastate School

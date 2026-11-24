@@ -16,6 +16,7 @@ import {
   ResetPasswordInput,
   type FormState,
 } from './schema';
+import { formValues, invalidState, keepValues } from './form-state';
 
 /**
  * Sign-in flows (spec §4.7). These are the only actions without requirePermission: they establish
@@ -40,31 +41,6 @@ async function allowAttempt(
   return data;
 }
 
-function formValues(formData: FormData): Record<string, string> {
-  const out: Record<string, string> = {};
-  for (const [k, v] of formData.entries()) if (typeof v === 'string') out[k] = v;
-  return out;
-}
-
-const SECRET_FIELDS = new Set(['password', 'confirm', 'code']);
-
-/** Echo back what the user typed, except secrets, so the form isn't emptied after an error. */
-function keep(formData: FormData): Record<string, string> {
-  const out: Record<string, string> = {};
-  for (const [k, v] of Object.entries(formValues(formData)))
-    if (!SECRET_FIELDS.has(k) && v.length <= 254) out[k] = v;
-  return out;
-}
-
-function invalid(formData: FormData, fieldErrors: Record<string, string[]>): FormState {
-  return {
-    status: 'error',
-    message: 'Please check the highlighted fields.',
-    fieldErrors,
-    values: keep(formData),
-  };
-}
-
 /** Where to send a freshly signed-in user: the MFA step if required, else their destination. */
 async function afterSignIn(supabase: TypedClient, next: string): Promise<string> {
   const { data: access } = await supabase.rpc('my_access');
@@ -78,24 +54,24 @@ async function afterSignIn(supabase: TypedClient, next: string): Promise<string>
 
 export async function login(_prev: FormState, formData: FormData): Promise<FormState> {
   const parsed = LoginInput.safeParse(formValues(formData));
-  if (!parsed.success) return invalid(formData, fieldErrorsOf(parsed.error));
+  if (!parsed.success) return invalidState(formData, fieldErrorsOf(parsed.error));
   const { email, password } = parsed.data;
   const next = safeNext(parsed.data.next);
 
   const supabase = await createClient();
   const allowed = await allowAttempt(supabase, 'login', email);
   if (allowed === 'error')
-    return { status: 'error', message: SOMETHING_WRONG, values: keep(formData) };
-  if (!allowed) return { status: 'error', message: RATE_LIMITED, values: keep(formData) };
+    return { status: 'error', message: SOMETHING_WRONG, values: keepValues(formData) };
+  if (!allowed) return { status: 'error', message: RATE_LIMITED, values: keepValues(formData) };
 
   const { error } = await supabase.auth.signInWithPassword({ email, password });
-  if (error) return { status: 'error', message: GENERIC_LOGIN_ERROR, values: keep(formData) };
+  if (error) return { status: 'error', message: GENERIC_LOGIN_ERROR, values: keepValues(formData) };
 
   // Invited-but-not-accepted and deactivated accounts cannot sign in (same generic message).
   const { data: access } = await supabase.rpc('my_access');
   if ((access as { status?: string } | null)?.status !== 'active') {
     await supabase.auth.signOut();
-    return { status: 'error', message: GENERIC_LOGIN_ERROR, values: keep(formData) };
+    return { status: 'error', message: GENERIC_LOGIN_ERROR, values: keepValues(formData) };
   }
   await supabase.rpc('record_login');
   redirect((await afterSignIn(supabase, next)) as never);
@@ -115,7 +91,7 @@ export async function requestPasswordReset(
   formData: FormData,
 ): Promise<FormState> {
   const parsed = ForgotPasswordInput.safeParse(formValues(formData));
-  if (!parsed.success) return invalid(formData, fieldErrorsOf(parsed.error));
+  if (!parsed.success) return invalidState(formData, fieldErrorsOf(parsed.error));
   const supabase = await createClient();
   const allowed = await allowAttempt(supabase, 'reset', parsed.data.email);
   if (allowed === 'error') return { status: 'error', message: SOMETHING_WRONG };
@@ -139,7 +115,7 @@ function passwordError(code: string | undefined): string {
 
 export async function resetPassword(_prev: FormState, formData: FormData): Promise<FormState> {
   const parsed = ResetPasswordInput.safeParse(formValues(formData));
-  if (!parsed.success) return invalid(formData, fieldErrorsOf(parsed.error));
+  if (!parsed.success) return invalidState(formData, fieldErrorsOf(parsed.error));
   const supabase = await createClient();
   const { data: claims } = await supabase.auth.getClaims();
   if (!claims?.claims.sub)
@@ -155,7 +131,7 @@ export async function resetPassword(_prev: FormState, formData: FormData): Promi
 
 export async function acceptInvite(_prev: FormState, formData: FormData): Promise<FormState> {
   const parsed = AcceptInviteInput.safeParse(formValues(formData));
-  if (!parsed.success) return invalid(formData, fieldErrorsOf(parsed.error));
+  if (!parsed.success) return invalidState(formData, fieldErrorsOf(parsed.error));
   const supabase = await createClient();
   const { data: claims } = await supabase.auth.getClaims();
   if (!claims?.claims.sub)
@@ -167,7 +143,8 @@ export async function acceptInvite(_prev: FormState, formData: FormData): Promis
     password: parsed.data.password,
     data: { full_name: parsed.data.fullName },
   });
-  if (error) return { status: 'error', message: passwordError(error.code), values: keep(formData) };
+  if (error)
+    return { status: 'error', message: passwordError(error.code), values: keepValues(formData) };
   const { error: rpcError } = await supabase.rpc('accept_invite', {
     p_full_name: parsed.data.fullName,
   });
@@ -175,7 +152,7 @@ export async function acceptInvite(_prev: FormState, formData: FormData): Promis
     return {
       status: 'error',
       message: 'This invitation has already been used. Try signing in instead.',
-      values: keep(formData),
+      values: keepValues(formData),
     };
   redirect((await afterSignIn(supabase, '/admin/overview')) as never);
 }
@@ -185,7 +162,7 @@ const BAD_CODE =
 
 export async function verifyMfa(_prev: FormState, formData: FormData): Promise<FormState> {
   const parsed = MfaCodeInput.safeParse(formValues(formData));
-  if (!parsed.success) return invalid(formData, fieldErrorsOf(parsed.error));
+  if (!parsed.success) return invalidState(formData, fieldErrorsOf(parsed.error));
   const supabase = await createClient();
   const { data: factors } = await supabase.auth.mfa.listFactors();
   const factor = factors?.totp[0]; // verified factors only
@@ -228,7 +205,7 @@ export async function confirmMfaEnrolment(
   formData: FormData,
 ): Promise<FormState> {
   const parsed = MfaEnrolConfirmInput.safeParse(formValues(formData));
-  if (!parsed.success) return invalid(formData, fieldErrorsOf(parsed.error));
+  if (!parsed.success) return invalidState(formData, fieldErrorsOf(parsed.error));
   const supabase = await createClient();
   const { error } = await supabase.auth.mfa.challengeAndVerify({
     factorId: parsed.data.factorId,

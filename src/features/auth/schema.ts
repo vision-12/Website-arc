@@ -1,10 +1,13 @@
 import { z } from 'zod';
 
 /** Shared client/server validation for the sign-in screens (UK English, plain language). */
+// Trim before validating: addresses pasted on phones often carry a trailing space.
 const email = z
-  .email('Enter a valid email address, like name@school.ac')
+  .string()
+  .trim()
+  .toLowerCase()
   .max(254)
-  .transform((v) => v.trim().toLowerCase());
+  .pipe(z.email('Enter a valid email address, like name@school.ac'));
 
 export const NewPassword = z
   .string()

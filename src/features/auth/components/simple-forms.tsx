@@ -1,17 +1,30 @@
 'use client';
 import { useActionState } from 'react';
 import Link from 'next/link';
+import { useSearchParam } from '@/hooks/use-search-param';
+import { safeNext } from '@/lib/auth/safe-next';
 import { acceptInvite, requestPasswordReset, resetPassword, verifyMfa } from '../actions';
-import { IDLE } from '../schema';
+import {
+  AcceptInviteInput,
+  ForgotPasswordInput,
+  IDLE,
+  MfaCodeInput,
+  ResetPasswordInput,
+} from '../schema';
 import { Field, FormMessage, SubmitButton } from './form-parts';
+import { useClientCheck } from './use-client-check';
+
+// Each form is checked in the browser with its action's own schema, then again on the server.
 
 const PASSWORD_HINT =
   'At least 12 characters, with a letter and a number. A short sentence is easy to remember.';
 
 export function ForgotPasswordForm() {
-  const [state, action] = useActionState(requestPasswordReset, IDLE);
+  const [serverState, action] = useActionState(requestPasswordReset, IDLE);
+  const { clientState, onSubmit } = useClientCheck(ForgotPasswordInput);
+  const state = clientState ?? serverState;
   return (
-    <form action={action} className="space-y-4" noValidate>
+    <form action={action} onSubmit={onSubmit} className="space-y-4" noValidate>
       <FormMessage state={state} />
       <Field
         name="email"
@@ -32,9 +45,11 @@ export function ForgotPasswordForm() {
 }
 
 export function ResetPasswordForm() {
-  const [state, action] = useActionState(resetPassword, IDLE);
+  const [serverState, action] = useActionState(resetPassword, IDLE);
+  const { clientState, onSubmit } = useClientCheck(ResetPasswordInput);
+  const state = clientState ?? serverState;
   return (
-    <form action={action} className="space-y-4" noValidate>
+    <form action={action} onSubmit={onSubmit} className="space-y-4" noValidate>
       <FormMessage state={state} />
       <Field
         name="password"
@@ -57,9 +72,11 @@ export function ResetPasswordForm() {
 }
 
 export function AcceptInviteForm({ defaultName }: { defaultName: string }) {
-  const [state, action] = useActionState(acceptInvite, IDLE);
+  const [serverState, action] = useActionState(acceptInvite, IDLE);
+  const { clientState, onSubmit } = useClientCheck(AcceptInviteInput);
+  const state = clientState ?? serverState;
   return (
-    <form action={action} className="space-y-4" noValidate>
+    <form action={action} onSubmit={onSubmit} className="space-y-4" noValidate>
       <FormMessage state={state} />
       <Field
         name="fullName"
@@ -88,10 +105,13 @@ export function AcceptInviteForm({ defaultName }: { defaultName: string }) {
   );
 }
 
-export function MfaChallengeForm({ next }: { next: string }) {
-  const [state, action] = useActionState(verifyMfa, IDLE);
+export function MfaChallengeForm() {
+  const [serverState, action] = useActionState(verifyMfa, IDLE);
+  const { clientState, onSubmit } = useClientCheck(MfaCodeInput);
+  const state = clientState ?? serverState;
+  const next = safeNext(useSearchParam('next'));
   return (
-    <form action={action} className="space-y-4" noValidate>
+    <form action={action} onSubmit={onSubmit} className="space-y-4" noValidate>
       <FormMessage state={state} />
       <input type="hidden" name="next" value={next} />
       <Field

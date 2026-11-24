@@ -1,4 +1,5 @@
 'use client';
+import { useTransition } from 'react';
 import Link from 'next/link';
 import { CircleUser } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -14,6 +15,7 @@ import { logout } from '@/features/auth/actions';
 import { t } from '@/lib/i18n/t';
 
 export function UserMenu({ name, email, roles }: { name: string; email: string; roles: string[] }) {
+  const [pending, startTransition] = useTransition();
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -38,12 +40,9 @@ export function UserMenu({ name, email, roles }: { name: string; email: string; 
         <DropdownMenuItem asChild>
           <Link href="/admin/account">Your account</Link>
         </DropdownMenuItem>
-        <DropdownMenuItem asChild>
-          <form action={logout} className="w-full">
-            <button type="submit" className="w-full text-left">
-              {t('common.signOut')}
-            </button>
-          </form>
+        {/* onSelect, not a nested <form>: menu items are activated by click and keyboard alike. */}
+        <DropdownMenuItem onSelect={() => startTransition(() => logout())} disabled={pending}>
+          {t('common.signOut')}
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>

@@ -1,5 +1,6 @@
 import 'server-only';
 import { cookies } from 'next/headers';
+import { connection } from 'next/server';
 import { createServerClient } from '@supabase/ssr';
 import { PostgrestClient } from '@supabase/postgrest-js';
 import type { SupabaseClient } from '@supabase/supabase-js';
@@ -14,6 +15,10 @@ export type TypedClient = SupabaseClient<Database>;
  * Never call this inside a `'use cache'` scope (cookies are request data).
  */
 export async function createClient(): Promise<TypedClient> {
+  // Request-time only. Under Cache Components, cookies() is "runtime data" that Next may still
+  // prerender (runtime prefetch); the auth client reads the clock on start-up, and user data must
+  // never be prerendered or cached anyway (MP §2.5).
+  await connection();
   const cookieStore = await cookies();
   return createServerClient<Database>(
     publicEnv.NEXT_PUBLIC_SUPABASE_URL,
