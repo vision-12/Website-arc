@@ -32,6 +32,10 @@ const config: NextConfig = {
   },
   images: {
     formats: ['image/avif', 'image/webp'],
+    // Next refuses to optimise images from private IPs (SSRF protection). Only the local Supabase
+    // stack (dev and CI) lives on loopback; a school's real project is a public supabase.co host,
+    // so production keeps the protection. remotePatterns below still pins the one allowed host.
+    dangerouslyAllowLocalIP: ['127.0.0.1', 'localhost'].includes(supabaseUrl.hostname),
     remotePatterns: [
       {
         protocol: supabaseUrl.protocol.replace(':', '') as 'http' | 'https',
@@ -42,7 +46,15 @@ const config: NextConfig = {
     ],
   },
   headers() {
-    return Promise.resolve([{ source: '/:path*', headers: securityHeaders }]);
+    return Promise.resolve([
+      { source: '/:path*', headers: securityHeaders },
+      // The template preview is embedded by the Appearance page (spec §6.4). For the same header
+      // key, the later rule wins; the CSP's frame-ancestors 'self' is set in proxy.ts.
+      {
+        source: '/preview/template/:path*',
+        headers: [{ key: 'X-Frame-Options', value: 'SAMEORIGIN' }],
+      },
+    ]);
   },
 };
 

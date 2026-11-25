@@ -69,6 +69,26 @@
   --color-ring: var(--ring);
   --color-brand: var(--brand-primary);
   --color-brand-text: var(--brand-primary-text);
+  /* Public-site template tokens: values are set per template under [data-template] (ADR-016). */
+  --color-tpl-bg: var(--tpl-bg);
+  --color-tpl-surface: var(--tpl-surface);
+  --color-tpl-surface-alt: var(--tpl-surface-alt);
+  --color-tpl-ink: var(--tpl-ink);
+  --color-tpl-ink-muted: var(--tpl-ink-muted);
+  --color-tpl-rule: var(--tpl-rule);
+  --color-tpl-rule-strong: var(--tpl-rule-strong);
+  --color-tpl-brand: var(--tpl-brand);
+  --color-tpl-brand-ink: var(--tpl-brand-ink);
+  --color-tpl-brand-text: var(--tpl-brand-text);
+  --color-tpl-accent: var(--tpl-accent);
+  --color-tpl-accent-ink: var(--tpl-accent-ink);
+  --color-tpl-band: var(--tpl-band);
+  --color-tpl-band-ink: var(--tpl-band-ink);
+  --color-tpl-band-muted: var(--tpl-band-muted);
+  --font-tpl-heading: var(--tpl-font-heading);
+  --font-tpl-body: var(--tpl-font-body);
+  --radius-tpl: var(--tpl-radius);
+  --radius-tpl-lg: var(--tpl-radius-lg);
   --radius-sm: calc(var(--radius) - 4px);
   --radius-md: calc(var(--radius) - 2px);
   --radius-lg: var(--radius);

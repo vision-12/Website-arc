@@ -4,6 +4,7 @@ const required = {
   CRON_SECRET: 'c'.repeat(40),
   FORM_SIGNING_SECRET: 'f'.repeat(40),
   IP_HASH_SALT: 's'.repeat(40),
+  PREVIEW_TOKEN_SECRET: 'p'.repeat(40),
 };
 const stubRequired = () => Object.entries(required).forEach(([k, v]) => vi.stubEnv(k, v));
 

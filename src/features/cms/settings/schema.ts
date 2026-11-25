@@ -12,7 +12,8 @@ export const HexColour = z
   .transform((v) => v.toLowerCase());
 export const FontKey = z.enum(FONT_KEYS);
 const uuid = z.uuid();
-const LinkTarget = z.union([
+/** Where a link points: a site path / https URL, or a CMS page (resolved to its path when rendered). */
+export const LinkTarget = z.union([
   z.object({
     href: z.string().regex(/^(\/|https:\/\/|mailto:|tel:)/, 'Use a site path or an https:// link'),
   }),

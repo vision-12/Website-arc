@@ -28,6 +28,7 @@ jobs:
       CRON_SECRET: ci-placeholder-cron-secret-0123456789abcdef
       FORM_SIGNING_SECRET: ci-placeholder-form-secret-0123456789abcdef
       IP_HASH_SALT: ci-placeholder-ip-salt-0123456789abcdef
+      PREVIEW_TOKEN_SECRET: ci-placeholder-preview-secret-0123456789abcdef
     steps:
       - uses: actions/checkout@v5
       - uses: actions/setup-node@v5

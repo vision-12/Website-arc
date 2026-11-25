@@ -13,7 +13,7 @@ The open questions in spec §9 were not individually answered. Each one therefor
 | Q5 retention periods | **No default** — retention cron is a no-op and the dashboard warns until set | Phase 13 |
 | Q6 languages | English only; UI strings go through a `t()` catalogue from Phase 1 | Phase 1 (adopted) |
 | Q7 SMS | Email only; `notify()` abstraction with an email adapter | Phase 12 |
-| Q8 template designs | Claude generates original designs; design checkpoint before Phase 3 sign-off | Phase 3 |
+| Q8 template designs | **Decided 25 Nov 2026:** four original designs approved at the Phase 3 design checkpoint (ADR-016) | Confirmed |
 | Q9 paper applications | Included (`admissions.create`) | Phase 12 |
 | Q10 own-items-only editing | No restriction | Phase 4 |
 | Q11 enquiry attachments | Not in v1 | Phase 11 |
@@ -32,3 +32,4 @@ The open questions in spec §9 were not individually answered. Each one therefor
 | Q24 media documents | PDF only | Phase 4 |
 | Q25 announcement emails | v2 | — |
 | Q26 public forms without JavaScript | **Decided 24 Nov 2026 (ADR-015):** JavaScript required for both public forms, with a `<noscript>` notice giving the school's phone and email (contact) or the paper route (admissions). A no-JS contact path was considered and not recommended: it can't run BotID or Turnstile, so bots would use it | Confirmed |
+| Q27 first-load JavaScript budget | **Decided 25 Nov 2026 (ADR-017):** public routes load the framework runtime (Next.js 16 + React 19, 132 KB gzipped, measured) plus at most 20 KB gzipped of our own JavaScript (15 KB today). MP §10's 120 KB total can't be met with the stack MP §2 pins | Confirmed |

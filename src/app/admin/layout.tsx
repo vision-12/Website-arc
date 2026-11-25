@@ -3,6 +3,7 @@ import Link from 'next/link';
 import { redirect } from 'next/navigation';
 import { ExternalLink } from 'lucide-react';
 import { SkipLink } from '@/components/shared/skip-link';
+import { StyleNonce } from '@/components/shared/style-nonce';
 import { OfflineBanner } from '@/components/shared/offline-banner';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Toaster } from '@/components/ui/toast';
@@ -90,6 +91,8 @@ export default async function AdminLayout({ children }: { children: React.ReactN
   const { settings } = await getSiteSettings();
   return (
     <div className="admin-scope flex min-h-dvh bg-background text-foreground">
+      {/* Radix overlays inject scroll-lock styles that need the CSP nonce (admin only). */}
+      <StyleNonce />
       <SkipLink />
       <Suspense fallback={<ShellSkeleton />}>
         <AdminFrame schoolName={settings.identity.name}>{children}</AdminFrame>

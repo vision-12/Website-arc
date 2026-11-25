@@ -32,6 +32,13 @@ describe('buildCsp', () => {
     expect(prod['upgrade-insecure-requests']).toBeDefined();
   });
 
+  it('lets only this site frame the template preview (spec §6.4)', () => {
+    const preview = parse(
+      buildCsp({ nonce, supabaseUrl: 'https://abcd.supabase.co', frameAncestors: 'self' }),
+    );
+    expect(preview['frame-ancestors']).toEqual(["'self'"]);
+  });
+
   it('allows the Supabase origin for images, media and connections only', () => {
     expect(prod['img-src']).toContain('https://abcd.supabase.co');
     expect(prod['connect-src']).toEqual(

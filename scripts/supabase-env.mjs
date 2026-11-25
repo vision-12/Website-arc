@@ -23,6 +23,7 @@ const env = {
   FORM_SIGNING_SECRET: 'local-form-signing-secret-0123456789abcdef', // gitleaks:allow (public dev value, matches seed.sql)
   IP_HASH_SALT: 'local-ip-hash-salt-0123456789abcdef', // gitleaks:allow (public dev value)
   CRON_SECRET: 'local-cron-secret-0123456789abcdef0123456789', // gitleaks:allow (public dev value)
+  PREVIEW_TOKEN_SECRET: 'local-preview-token-secret-0123456789abcdef', // gitleaks:allow (public dev value)
 };
 
 for (const [k, v] of Object.entries(env)) {

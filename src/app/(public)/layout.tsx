@@ -1,27 +1,30 @@
+import '@/features/templates/shared/base.css';
+import '@/features/templates/institutional-classic/tokens.css';
+import '@/features/templates/modern-academic/tokens.css';
+import '@/features/templates/heritage-prestige/tokens.css';
+import '@/features/templates/contemporary-community/tokens.css';
 import { SkipLink } from '@/components/shared/skip-link';
 import { getSiteSettings } from '@/features/cms/settings/queries';
+import { getTemplate } from '@/features/templates/registry';
+import { MenuEnhancer } from '@/features/templates/shared/islands/menu-enhancer';
+import { resolveShell } from '@/features/templates/shared/shell';
 import { currentYear } from '@/lib/dates/current-year';
 
-/** Minimal public shell. Phase 3 replaces the header/footer with the active template's components. */
+/** The public site in the school's chosen template (MP §3.3): its header, the page, its footer. */
 export default async function PublicLayout({ children }: { children: React.ReactNode }) {
   const { settings } = await getSiteSettings();
-  const year = await currentYear();
+  const template = getTemplate(settings.theme.template);
+  const shell = await resolveShell(settings, await currentYear());
+  const { Header, Footer } = template;
   return (
-    <div className="site-scope flex min-h-dvh flex-col">
+    <div data-template={template.key} className="site-scope flex min-h-dvh flex-col">
       <SkipLink />
-      <header className="border-b bg-card">
-        <div className="mx-auto flex max-w-6xl items-center px-4 py-4">
-          <p className="text-lg font-semibold">{settings.identity.name}</p>
-        </div>
-      </header>
-      <main id="main-content" tabIndex={-1} className="mx-auto w-full max-w-6xl flex-1 px-4 py-10">
+      <Header shell={shell} />
+      <main id="main-content" tabIndex={-1} className="flex-1 outline-none">
         {children}
       </main>
-      <footer className="border-t bg-card">
-        <p className="mx-auto max-w-6xl px-4 py-6 text-sm text-muted-foreground">
-          © {year} {settings.footer.copyrightName ?? settings.identity.name}
-        </p>
-      </footer>
+      <Footer shell={shell} />
+      <MenuEnhancer />
     </div>
   );
 }

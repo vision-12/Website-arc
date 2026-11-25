@@ -22,9 +22,9 @@ select tests.authenticate_as((select ce from u));
 select is(tests.visible_rows('public.applications'), 0, 'content editor cannot read applications');
 select is(tests.visible_rows('public.contact_messages'), 0, 'content editor cannot read enquiries');
 select is(tests.visible_rows('public.admission_notes'), 0, 'content editor cannot read admission notes');
-select is(tests.visible_rows('public.pages'), 3, 'content editor sees all pages, including drafts');
+select is(tests.visible_rows('public.pages', $$slug in ('draft-page', 'live-page', 'future-page')$$), 3, 'content editor sees all pages, including drafts');
 select lives_ok($$insert into public.pages (title, slug) values ('New page', 'new-page')$$, 'content editor can create a page');
-select is(tests.visible_rows('storage.objects'), 0, 'content editor cannot see admission documents');
+select is(tests.visible_rows('storage.objects', $$bucket_id = 'admission-documents'$$), 0, 'content editor cannot see admission documents');
 select tests.as_system();
 
 -- Events Manager

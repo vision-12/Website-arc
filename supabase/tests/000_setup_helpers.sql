@@ -91,6 +91,16 @@ begin
 exception when insufficient_privilege then return 0;
 end $$;
 
+-- Same, limited to rows matching a filter: tests count their own fixtures, so the local demo
+-- school's published pages and photos (supabase/seed/demo-*.sql) don't change the numbers.
+create or replace function tests.visible_rows(p_table text, p_where text) returns int language plpgsql set search_path = '' as $$
+declare n int;
+begin
+  execute format('select count(*) from %s where %s', p_table, p_where) into n;
+  return n;
+exception when insufficient_privilege then return 0;
+end $$;
+
 -- Sets one feature flag in site_settings (creating a minimal row if needed). System context only.
 create or replace function tests.set_feature(p_flag text, p_on boolean) returns void language plpgsql security definer set search_path = '' as $$
 begin
