@@ -73,7 +73,7 @@ schema_paths = []
 enabled = true
 # Specifies an ordered list of seed files to load during db reset.
 # Supports glob patterns relative to supabase directory: "./seeds/*.sql"
-sql_paths = ["./seed.sql"]
+sql_paths = ["./seed.sql", "./seed/demo-media.sql", "./seed/demo-content.sql"]
 
 [db.network_restrictions]
 # Enable management of network restrictions.
@@ -122,12 +122,14 @@ enabled = true
 # The maximum file size allowed (e.g. "5MB", "500KB").
 file_size_limit = "50MiB"
 
-# Uncomment to configure local storage buckets
-# [storage.buckets.images]
-# public = false
-# file_size_limit = "50MiB"
-# allowed_mime_types = ["image/png", "image/jpeg"]
-# objects_path = "./images"
+# Local demo images (Phase 3): the CLI uploads ./seed/media into the `media` bucket on start and
+# db reset. The bucket itself is defined by migration 20261123001300_storage.sql; these settings
+# mirror it exactly so the local stack never drifts from what provisioning creates.
+[storage.buckets.media]
+public = true
+file_size_limit = "20MiB"
+allowed_mime_types = ["image/jpeg", "image/png", "image/webp", "image/avif", "image/gif", "image/svg+xml", "application/pdf"]
+objects_path = "./seed/media"
 
 # Allow connections via S3 compatible clients
 [storage.s3_protocol]
