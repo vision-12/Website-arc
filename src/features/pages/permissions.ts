@@ -14,6 +14,14 @@ export async function pagePublishPermission(): Promise<string> {
   return `pages.${publishAction(await approvalOn())}`;
 }
 
+/** Built-in pages can be edited and hidden, but never moved to Trash (spec §1.4; DB-enforced). */
+export function withoutTrashForBuiltIn<T extends string>(
+  actions: T[],
+  systemKey: string | null,
+): T[] {
+  return systemKey ? actions.filter((a) => a !== 'trash') : actions;
+}
+
 /** The lifecycle context for the editor's buttons. The server re-checks every action. */
 export function pageEditorContext(
   access: Access,

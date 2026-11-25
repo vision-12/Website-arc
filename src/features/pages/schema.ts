@@ -1,4 +1,4 @@
-import { z } from 'zod';
+import { z } from '@/lib/zod';
 import { TiptapDoc } from '@/lib/rich-text/schema';
 import { PublishAt, SendBackNote, Version } from '@/features/content/schema';
 import { SLUG_MAX, SLUG_RE } from '@/features/content/slug';

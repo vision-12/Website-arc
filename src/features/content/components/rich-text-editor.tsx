@@ -414,6 +414,8 @@ export function RichTextEditor({
     content: value as JSONContent,
     editable,
     immediatelyRender: false,
+    // Its <style> element would have no CSP nonce; the same rules are in rich-text-editor.css.
+    injectCSS: false,
     editorProps: {
       attributes: {
         'aria-label': label,

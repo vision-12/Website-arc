@@ -1,5 +1,5 @@
 import { NextResponse, type NextRequest } from 'next/server';
-import { z } from 'zod';
+import { z } from '@/lib/zod';
 import { hasCronSecret } from '@/lib/security/cron-auth';
 import { createAdminClient } from '@/lib/supabase/admin';
 

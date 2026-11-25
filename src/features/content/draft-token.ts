@@ -1,5 +1,5 @@
 import { createHmac, timingSafeEqual } from 'node:crypto';
-import { z } from 'zod';
+import { z } from '@/lib/zod';
 
 /**
  * Draft preview links (MP §5 "Preview", spec §4.8 /api/draft). An HMAC-signed payload naming the

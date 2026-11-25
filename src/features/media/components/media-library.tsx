@@ -1,5 +1,5 @@
 'use client';
-import { useRef, useState, useTransition } from 'react';
+import { useEffect, useRef, useState, useTransition } from 'react';
 import { ImageIcon, LayoutGrid, List, Search } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -7,6 +7,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { EmptyState } from '@/components/shared/empty-state';
 import { toast } from '@/components/ui/toast';
+import { useSearchParam } from '@/hooks/use-search-param';
 import { formatFileSize } from '@/lib/format/file-size';
 import { cn } from '@/lib/utils';
 import { mediaUsages, searchMedia } from '../actions';
@@ -37,7 +38,10 @@ export function MediaLibrary({ initial, can }: { initial: MediaPage; can: MediaP
   const [items, setItems] = useState(initial.items);
   const [total, setTotal] = useState(initial.total);
   const [page, setPage] = useState(1);
-  const [filter, setFilter] = useState<Filter>('all');
+  // The dashboard links here with ?filter=missing-description (MP §5.10: tiles open filtered lists).
+  const fromUrl = useSearchParam('filter') === 'missing-description' ? 'missingAlt' : null;
+  const [chosen, setFilter] = useState<Filter | null>(null);
+  const filter: Filter = chosen ?? fromUrl ?? 'all';
   const [q, setQ] = useState('');
   const [view, setView] = useState<'grid' | 'list'>('grid');
   const [selected, setSelected] = useState<MediaItem | null>(null);
@@ -53,6 +57,10 @@ export function MediaLibrary({ initial, can }: { initial: MediaPage; can: MediaP
       setTotal(r.data.total);
       setPage(nextPage);
     });
+
+  useEffect(() => {
+    if (fromUrl) load(fromUrl, '', 1);
+  }, [fromUrl]);
 
   const open = (item: MediaItem) => {
     setSelected(item);

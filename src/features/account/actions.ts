@@ -1,7 +1,7 @@
 'use server';
 import 'server-only';
 import { revalidatePath } from 'next/cache';
-import { z } from 'zod';
+import { z } from '@/lib/zod';
 import { defineUserAction } from '@/lib/actions/define';
 import { ForbiddenError } from '@/lib/auth/errors';
 import { logActivity } from '@/lib/audit/log';

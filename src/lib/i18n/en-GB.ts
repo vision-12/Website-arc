@@ -42,6 +42,7 @@ export const enGB = {
       users: 'Users & permissions',
       settings: 'Settings',
       activity: 'Activity log',
+      trash: 'Trash',
     },
     overview: {
       heading: 'Overview',

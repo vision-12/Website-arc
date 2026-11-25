@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { z } from 'zod';
+import { z } from '@/lib/zod';
 import { ForbiddenError } from '@/lib/auth/errors';
 
 const requirePermission = vi.fn();

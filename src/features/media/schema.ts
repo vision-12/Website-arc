@@ -1,4 +1,4 @@
-import { z } from 'zod';
+import { z } from '@/lib/zod';
 import { formatFileSize } from '@/lib/format/file-size';
 import { Version } from '@/features/content/schema';
 

@@ -1,4 +1,4 @@
-import { z } from 'zod';
+import { z } from '@/lib/zod';
 import { HomeSection, Theme } from '@/features/cms/settings/schema';
 
 /** The four template keys (spec §6.1). */

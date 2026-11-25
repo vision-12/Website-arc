@@ -7,7 +7,11 @@ import { canEditContent, editorActions } from '@/features/content/lifecycle';
 import { getMediaByIds } from '@/features/media/queries';
 import { PageEditor } from '@/features/pages/components/page-editor';
 import { pagesContent } from '@/features/pages/module';
-import { approvalOn, pageEditorContext } from '@/features/pages/permissions';
+import {
+  approvalOn,
+  pageEditorContext,
+  withoutTrashForBuiltIn,
+} from '@/features/pages/permissions';
 import { listPages, parentOptions } from '@/features/pages/queries';
 import { can, requireUser } from '@/lib/auth/access';
 import { requestTime } from '@/lib/dates/zoned';
@@ -70,7 +74,7 @@ export default async function EditPage({ params }: PageProps<'/admin/pages/[id]'
         editors={state.editors}
         reviewNote={state.reviewNote}
         lastEditedBy={state.lastEditedBy}
-        actions={editorActions(ctx)}
+        actions={withoutTrashForBuiltIn(editorActions(ctx), state.row.system_key)}
         canEdit={canEditContent(ctx)}
         parents={parentOptions(pages, id)}
         media={media}

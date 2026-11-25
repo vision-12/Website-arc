@@ -1,4 +1,4 @@
-import { z } from 'zod';
+import { z } from '../zod'; // relative: next.config.ts loads this file and can't resolve '@/'
 
 /**
  * Environment contract (MASTER_PROMPT §9 + spec §7.4).

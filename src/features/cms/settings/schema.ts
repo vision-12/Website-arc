@@ -1,4 +1,4 @@
-import { z } from 'zod';
+import { z } from '@/lib/zod';
 import { FONT_KEYS } from '@/lib/fonts/keys';
 
 /** `site_settings` contract — MASTER_PROMPT §3.2 plus spec §1.3 extensions. Shared client/server. */

@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { z } from 'zod';
+import { z } from '@/lib/zod';
 import { ForbiddenError, MfaRequiredError, UnauthenticatedError } from '@/lib/auth/errors';
 import { ActionFailure, MESSAGES, toActionError } from '../errors';
 

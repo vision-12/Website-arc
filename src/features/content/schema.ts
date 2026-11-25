@@ -1,4 +1,4 @@
-import { z } from 'zod';
+import { z } from '@/lib/zod';
 
 /** Inputs shared by every content module's actions (spec §4.1). Client-safe. */
 
