@@ -64,7 +64,9 @@ const FALLBACKS = {
   ],
 };
 
-const pct = (n) => `${(n * 100).toFixed(2)}%`;
+// Two decimals, written the way Prettier writes CSS numbers (0.00 → 0, 90.40 → 90.4), so the
+// committed file stays byte-identical after the pre-commit formatter runs.
+const pct = (n) => `${Number((n * 100).toFixed(2))}%`;
 
 /** Next's calculateFallbackFontValues: overrides that make `fallback` take `main`'s space. */
 export function fallbackOverrides(main, fallback) {

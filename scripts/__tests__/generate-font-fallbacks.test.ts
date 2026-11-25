@@ -11,7 +11,7 @@ describe('generate-font-fallbacks', () => {
       sizeAdjust: '107.12%',
       ascentOverride: '90.44%',
       descentOverride: '22.52%',
-      lineGapOverride: '0.00%',
+      lineGapOverride: '0%',
     });
   });
 
