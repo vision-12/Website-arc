@@ -1,0 +1,100 @@
+# Phase 3 verification (2026-11-25T18:03Z, local stack, production build)
+
+## $ npm run typecheck
+> altrastate-school@0.1.0 typecheck
+> next typegen && tsc --noEmit
+Generating route types...
+✓ Types generated successfully
+exit: 0
+
+## $ npm run lint
+> altrastate-school@0.1.0 lint
+> eslint . --max-warnings=0
+exit: 0
+
+## $ npx vitest run --coverage
+ src/lib/audit     |     100 |    92.85 |     100 |     100 |                   
+  log.ts           |     100 |       90 |     100 |     100 | 21                
+ src/lib/auth      |   93.87 |    95.45 |     100 |    97.5 |                   
+  access.ts        |   96.55 |    96.55 |     100 |     100 | 42                
+  safe-next.ts     |   84.61 |    93.33 |     100 |   88.88 | 16                
+ src/lib/colour    |    97.8 |    90.24 |     100 |    97.4 |                   
+  suggest.ts       |   90.47 |    76.47 |     100 |    87.5 | 31-32             
+ src/lib/env       |   97.14 |    89.47 |     100 |   96.55 |                   
+  schema.ts        |   96.96 |    89.47 |     100 |   96.29 | 98                
+-------------------|---------|----------|---------|---------|-------------------
+=============================== Coverage summary ===============================
+Statements   : 94.52% ( 380/402 )
+Branches     : 89.14% ( 230/258 )
+Functions    : 100% ( 99/99 )
+Lines        : 94.76% ( 326/344 )
+================================================================================
+exit: 0
+
+## $ npm run test:int
+> altrastate-school@0.1.0 test:int
+> vitest run --config vitest.integration.config.mts
+ RUN  v5.1.1 /home/user/website-arc
+ Test Files  3 passed (3)
+      Tests  10 passed (10)
+   Start at  18:03:56
+   Duration  3.31s (tests 85%, import 12%, transform 3%)
+exit: 0
+
+## $ npm run test:db
+/home/user/website-arc/supabase/tests/23_mfa.sql .................. ok
+/home/user/website-arc/supabase/tests/24_support_access.sql ....... ok
+/home/user/website-arc/supabase/tests/25_session_rpcs.sql ......... ok
+/home/user/website-arc/supabase/tests/30_lifecycle.sql ............ ok
+/home/user/website-arc/supabase/tests/31_append_only.sql .......... ok
+/home/user/website-arc/supabase/tests/32_audit_trail.sql .......... ok
+/home/user/website-arc/supabase/tests/40_submit_application.sql ... 
+# Failed (TODO) test 1: "submit_application rejects a client-supplied status"
+# Failed (TODO) test 2: "submit_application rejects a client-supplied reference"
+ok
+/home/user/website-arc/supabase/tests/41_reference.sql ............ ok
+/home/user/website-arc/supabase/tests/44_storage_staff.sql ........ ok
+/home/user/website-arc/supabase/tests/45_auth_admin_jobs.sql ...... ok
+All tests successful.
+Files=20, Tests=132,  2 wallclock secs ( 0.10 usr  0.02 sys +  0.17 cusr  0.10 csys =  0.39 CPU)
+Result: PASS
+exit: 0
+
+## $ npm run check:actions
+> altrastate-school@0.1.0 check:actions
+> node scripts/check-actions.mjs
+check-actions: every feature action goes through defineAction/defineUserAction
+exit: 0
+
+## $ node scripts/check-school-values.mjs
+check-school-values: no school-specific values in src/
+exit: 0
+
+## $ node scripts/check-advisors.mjs
+Supabase advisors: no findings.
+exit: 0
+
+## $ npm run build
+│ ├ ◐ /preview/demo/[key]/page/[layout]                          1h      1d
+│ ├ ◐ /preview/demo/institutional-classic/page/[layout]          1h      1d
+│ ├ ◐ /preview/demo/institutional-classic/page/default           1h      1d
+│ └ ◐ [+14 more paths]
+├   /preview/template/[key]                                      1h      1d
+│ ├ ◐ /preview/template/[key]                                    1h      1d
+│ ├ ◐ /preview/template/institutional-classic                    1h      1d
+│ ├ ◐ /preview/template/modern-academic                          1h      1d
+│ └ ◐ [+2 more paths]
+├ ◐ /reset-password                                              1h      1d
+├ ○ /robots.txt                                                  1h      1d
+└ ƒ /theme.css
+ƒ Proxy (Middleware)
+○  (Static)             prerendered as static content
+◐  (Partial Prerender)  prerendered as static HTML with dynamic server-streamed content
+ƒ  (Dynamic)            server-rendered on demand
+exit: 0
+
+## $ npx playwright test (full suite, 1280 px, 360 px, Pixel 7)
+
+  30 skipped
+  129 passed (2.8m)
+EXIT 0

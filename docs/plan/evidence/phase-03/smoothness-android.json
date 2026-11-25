@@ -1,0 +1,68 @@
+{
+  "profile": "Pixel 7, CPU 4x slower, slow 4G (150 ms RTT, 1.6 Mbps), production build",
+  "runs": [
+    {
+      "lcpMs": 836,
+      "cls": 0.0003,
+      "longFramesWhileInteracting": [
+        {
+          "during": "changing slide",
+          "durationMs": 72,
+          "blockingMs": 0,
+          "renderingMs": 1,
+          "scripts": []
+        }
+      ],
+      "longFramesWhileLoading": 2
+    },
+    {
+      "lcpMs": 860,
+      "cls": 0.0003,
+      "longFramesWhileInteracting": [
+        {
+          "during": "changing slide",
+          "durationMs": 59,
+          "blockingMs": 7,
+          "renderingMs": 3,
+          "scripts": [
+            "#document.onclick 7ms"
+          ]
+        }
+      ],
+      "longFramesWhileLoading": 2
+    },
+    {
+      "lcpMs": 892,
+      "cls": 0.0003,
+      "longFramesWhileInteracting": [
+        {
+          "during": "scrolling (step 10)",
+          "durationMs": 63,
+          "blockingMs": 0,
+          "renderingMs": 0,
+          "scripts": [
+            "ReadableStreamDefaultReader.read.then 17ms",
+            "ReadableStreamDefaultReader.read.then 6ms"
+          ]
+        },
+        {
+          "during": "changing slide",
+          "durationMs": 51,
+          "blockingMs": 0,
+          "renderingMs": 2,
+          "scripts": []
+        },
+        {
+          "during": "changing slide",
+          "durationMs": 52,
+          "blockingMs": 0,
+          "renderingMs": 3,
+          "scripts": [
+            "#document.onclick 7ms"
+          ]
+        }
+      ],
+      "longFramesWhileLoading": 2
+    }
+  ]
+}

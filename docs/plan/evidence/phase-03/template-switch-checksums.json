@@ -1,0 +1,334 @@
+{
+  "test": "src/features/templates/__tests__/template-switch.int.test.ts",
+  "route": [
+    "institutional-classic",
+    "modern-academic",
+    "heritage-prestige",
+    "contemporary-community",
+    "institutional-classic"
+  ],
+  "changedAfterEachSwitch": [
+    {
+      "template": "modern-academic",
+      "changedTables": [
+        "public.activity_logs",
+        "public.site_settings"
+      ]
+    },
+    {
+      "template": "heritage-prestige",
+      "changedTables": [
+        "public.activity_logs",
+        "public.site_settings"
+      ]
+    },
+    {
+      "template": "contemporary-community",
+      "changedTables": [
+        "public.activity_logs",
+        "public.site_settings"
+      ]
+    },
+    {
+      "template": "institutional-classic",
+      "changedTables": [
+        "public.activity_logs",
+        "public.site_settings"
+      ]
+    }
+  ],
+  "tablesCompared": 36,
+  "unchanged": 34,
+  "before": {
+    "private.rate_limit_buckets": {
+      "rows": 0,
+      "checksum": "d41d8cd98f00b204e9800998ecf8427e"
+    },
+    "private.submission_tickets_used": {
+      "rows": 0,
+      "checksum": "d41d8cd98f00b204e9800998ecf8427e"
+    },
+    "public.activity_logs": {
+      "rows": 252,
+      "checksum": "3c9367a66c61232fc443f1159793200e"
+    },
+    "public.admission_form_versions": {
+      "rows": 0,
+      "checksum": "d41d8cd98f00b204e9800998ecf8427e"
+    },
+    "public.admission_forms": {
+      "rows": 0,
+      "checksum": "d41d8cd98f00b204e9800998ecf8427e"
+    },
+    "public.admission_info_requests": {
+      "rows": 0,
+      "checksum": "d41d8cd98f00b204e9800998ecf8427e"
+    },
+    "public.admission_intake_classes": {
+      "rows": 0,
+      "checksum": "d41d8cd98f00b204e9800998ecf8427e"
+    },
+    "public.admission_intakes": {
+      "rows": 0,
+      "checksum": "d41d8cd98f00b204e9800998ecf8427e"
+    },
+    "public.admission_notes": {
+      "rows": 0,
+      "checksum": "d41d8cd98f00b204e9800998ecf8427e"
+    },
+    "public.admission_status_history": {
+      "rows": 0,
+      "checksum": "d41d8cd98f00b204e9800998ecf8427e"
+    },
+    "public.admission_statuses": {
+      "rows": 7,
+      "checksum": "a3428fb5a234614d1de4877ac3b8649e"
+    },
+    "public.application_documents": {
+      "rows": 0,
+      "checksum": "d41d8cd98f00b204e9800998ecf8427e"
+    },
+    "public.application_medical": {
+      "rows": 0,
+      "checksum": "d41d8cd98f00b204e9800998ecf8427e"
+    },
+    "public.application_upload_sessions": {
+      "rows": 0,
+      "checksum": "d41d8cd98f00b204e9800998ecf8427e"
+    },
+    "public.applications": {
+      "rows": 0,
+      "checksum": "d41d8cd98f00b204e9800998ecf8427e"
+    },
+    "public.auth_admin_jobs": {
+      "rows": 0,
+      "checksum": "d41d8cd98f00b204e9800998ecf8427e"
+    },
+    "public.contact_messages": {
+      "rows": 0,
+      "checksum": "d41d8cd98f00b204e9800998ecf8427e"
+    },
+    "public.content_drafts": {
+      "rows": 0,
+      "checksum": "d41d8cd98f00b204e9800998ecf8427e"
+    },
+    "public.email_messages": {
+      "rows": 0,
+      "checksum": "d41d8cd98f00b204e9800998ecf8427e"
+    },
+    "public.email_suppressions": {
+      "rows": 0,
+      "checksum": "d41d8cd98f00b204e9800998ecf8427e"
+    },
+    "public.enquiry_notes": {
+      "rows": 0,
+      "checksum": "d41d8cd98f00b204e9800998ecf8427e"
+    },
+    "public.media_assets": {
+      "rows": 19,
+      "checksum": "00d9cca950a12816282b3eff76ed7c7c"
+    },
+    "public.media_usages": {
+      "rows": 0,
+      "checksum": "d41d8cd98f00b204e9800998ecf8427e"
+    },
+    "public.pages": {
+      "rows": 4,
+      "checksum": "9e26bafae04a553559c31a56e1dd1ce1"
+    },
+    "public.permissions": {
+      "rows": 68,
+      "checksum": "b62fde6573889fb6d1f7b66a89dc90ab"
+    },
+    "public.profiles": {
+      "rows": 9,
+      "checksum": "6a71b7b4386cd19eb1f80c71c1ae9135"
+    },
+    "public.redirects": {
+      "rows": 0,
+      "checksum": "d41d8cd98f00b204e9800998ecf8427e"
+    },
+    "public.retention_runs": {
+      "rows": 0,
+      "checksum": "d41d8cd98f00b204e9800998ecf8427e"
+    },
+    "public.role_permissions": {
+      "rows": 233,
+      "checksum": "272c3b691a96f9276fe56254fb60bbbf"
+    },
+    "public.roles": {
+      "rows": 8,
+      "checksum": "63c92253df73a9cd1271b9dd26fb8bac"
+    },
+    "public.site_settings": {
+      "rows": 1,
+      "checksum": "14ec3b6c3760c0d6595a6319ebf0dce5"
+    },
+    "public.site_settings_private": {
+      "rows": 1,
+      "checksum": "c39676413553f62bf57c66dd9c428c23"
+    },
+    "public.support_access_grants": {
+      "rows": 0,
+      "checksum": "d41d8cd98f00b204e9800998ecf8427e"
+    },
+    "public.user_roles": {
+      "rows": 9,
+      "checksum": "0e6fc9f4121422355b41d528847c4ae2"
+    },
+    "storage.buckets": {
+      "rows": 3,
+      "checksum": "34109d937132d33fee06aaa2774a2f3f"
+    },
+    "storage.objects": {
+      "rows": 19,
+      "checksum": "322f96ea475d4067afb320373baa5a17"
+    }
+  },
+  "after": {
+    "private.rate_limit_buckets": {
+      "rows": 0,
+      "checksum": "d41d8cd98f00b204e9800998ecf8427e"
+    },
+    "private.submission_tickets_used": {
+      "rows": 0,
+      "checksum": "d41d8cd98f00b204e9800998ecf8427e"
+    },
+    "public.activity_logs": {
+      "rows": 256,
+      "checksum": "1ed49750451318883b2632697350158a"
+    },
+    "public.admission_form_versions": {
+      "rows": 0,
+      "checksum": "d41d8cd98f00b204e9800998ecf8427e"
+    },
+    "public.admission_forms": {
+      "rows": 0,
+      "checksum": "d41d8cd98f00b204e9800998ecf8427e"
+    },
+    "public.admission_info_requests": {
+      "rows": 0,
+      "checksum": "d41d8cd98f00b204e9800998ecf8427e"
+    },
+    "public.admission_intake_classes": {
+      "rows": 0,
+      "checksum": "d41d8cd98f00b204e9800998ecf8427e"
+    },
+    "public.admission_intakes": {
+      "rows": 0,
+      "checksum": "d41d8cd98f00b204e9800998ecf8427e"
+    },
+    "public.admission_notes": {
+      "rows": 0,
+      "checksum": "d41d8cd98f00b204e9800998ecf8427e"
+    },
+    "public.admission_status_history": {
+      "rows": 0,
+      "checksum": "d41d8cd98f00b204e9800998ecf8427e"
+    },
+    "public.admission_statuses": {
+      "rows": 7,
+      "checksum": "a3428fb5a234614d1de4877ac3b8649e"
+    },
+    "public.application_documents": {
+      "rows": 0,
+      "checksum": "d41d8cd98f00b204e9800998ecf8427e"
+    },
+    "public.application_medical": {
+      "rows": 0,
+      "checksum": "d41d8cd98f00b204e9800998ecf8427e"
+    },
+    "public.application_upload_sessions": {
+      "rows": 0,
+      "checksum": "d41d8cd98f00b204e9800998ecf8427e"
+    },
+    "public.applications": {
+      "rows": 0,
+      "checksum": "d41d8cd98f00b204e9800998ecf8427e"
+    },
+    "public.auth_admin_jobs": {
+      "rows": 0,
+      "checksum": "d41d8cd98f00b204e9800998ecf8427e"
+    },
+    "public.contact_messages": {
+      "rows": 0,
+      "checksum": "d41d8cd98f00b204e9800998ecf8427e"
+    },
+    "public.content_drafts": {
+      "rows": 0,
+      "checksum": "d41d8cd98f00b204e9800998ecf8427e"
+    },
+    "public.email_messages": {
+      "rows": 0,
+      "checksum": "d41d8cd98f00b204e9800998ecf8427e"
+    },
+    "public.email_suppressions": {
+      "rows": 0,
+      "checksum": "d41d8cd98f00b204e9800998ecf8427e"
+    },
+    "public.enquiry_notes": {
+      "rows": 0,
+      "checksum": "d41d8cd98f00b204e9800998ecf8427e"
+    },
+    "public.media_assets": {
+      "rows": 19,
+      "checksum": "00d9cca950a12816282b3eff76ed7c7c"
+    },
+    "public.media_usages": {
+      "rows": 0,
+      "checksum": "d41d8cd98f00b204e9800998ecf8427e"
+    },
+    "public.pages": {
+      "rows": 4,
+      "checksum": "9e26bafae04a553559c31a56e1dd1ce1"
+    },
+    "public.permissions": {
+      "rows": 68,
+      "checksum": "b62fde6573889fb6d1f7b66a89dc90ab"
+    },
+    "public.profiles": {
+      "rows": 9,
+      "checksum": "6a71b7b4386cd19eb1f80c71c1ae9135"
+    },
+    "public.redirects": {
+      "rows": 0,
+      "checksum": "d41d8cd98f00b204e9800998ecf8427e"
+    },
+    "public.retention_runs": {
+      "rows": 0,
+      "checksum": "d41d8cd98f00b204e9800998ecf8427e"
+    },
+    "public.role_permissions": {
+      "rows": 233,
+      "checksum": "272c3b691a96f9276fe56254fb60bbbf"
+    },
+    "public.roles": {
+      "rows": 8,
+      "checksum": "63c92253df73a9cd1271b9dd26fb8bac"
+    },
+    "public.site_settings": {
+      "rows": 1,
+      "checksum": "eca3d4684f9b98b86f9ad5befdff515f"
+    },
+    "public.site_settings_private": {
+      "rows": 1,
+      "checksum": "c39676413553f62bf57c66dd9c428c23"
+    },
+    "public.support_access_grants": {
+      "rows": 0,
+      "checksum": "d41d8cd98f00b204e9800998ecf8427e"
+    },
+    "public.user_roles": {
+      "rows": 9,
+      "checksum": "0e6fc9f4121422355b41d528847c4ae2"
+    },
+    "storage.buckets": {
+      "rows": 3,
+      "checksum": "34109d937132d33fee06aaa2774a2f3f"
+    },
+    "storage.objects": {
+      "rows": 19,
+      "checksum": "322f96ea475d4067afb320373baa5a17"
+    }
+  }
+}

@@ -1,6 +1,6 @@
 # Phase 3 — Public shell & template engine (plan)
 
-**Status:** awaiting approval. Nothing in this file has been built yet.
+**Status:** **Done** (25 Nov 2026). Plan approved (P3-A … P3-G); design checkpoint approved (Q8). Outcome and changes against this plan: §11.
 **Inputs:**
 - MP §3.1–3.4, §10 and §12 (Phase 3 prompt)
 - Spec §5.1 (public `layout.tsx`, `/`, `/preview/template/[key]`), §6.1–6.5 (template contract, theme pipeline, section registry, preview, visual direction) and §4.3 (`appearance.createPreviewToken`)
@@ -222,3 +222,42 @@ src/app/preview/demo/[key]/page.tsx (+ /page)    demo gallery (P3-C)
 - **Hero video slides** → Phase 5. The media library can't store video yet: its MIME types allow images and PDF only.
 - **The header search box** → when `/search` is built. The header reserves its place.
 - **Lighthouse CI** → Phase 14. Phase 3 records the JavaScript and hero-image budgets in E2E.
+
+## 11. Outcome (25 Nov 2026)
+
+### Definition of Done (MP §12), item by item
+
+Evidence lives in `docs/plan/evidence/phase-03/`.
+
+| Item | Result | Evidence |
+|---|---|---|
+| Migrations applied cleanly to a fresh DB | ✅ no new migrations; the demo seed loads with `db reset` (19 photos into the local `media` bucket) | `verification.txt` |
+| RLS + pgTAP pass | ✅ 20 files, 132 assertions. Four Phase 2 tests counted whole tables and broke once the demo seed added public pages and photos. They now count their own fixtures, or the `admission-documents` bucket | `verification.txt` |
+| Zod schemas shared client/server | ✅ per-type section settings (`section-settings.ts`) feed the loaders now and Phase 5's editor later; the preview token's payload and overrides are Zod-checked when signed and when read | unit tests |
+| Every action calls `requirePermission` | ✅ `createPreviewToken` uses `defineAction` (`appearance.manage`); `check:actions` | `verification.txt` |
+| Unit + integration tests | ✅ unit 192 (94.5 % statements, 100 % functions); integration 10, including **the template-switch checksum test** | `verification.txt` |
+| E2E incl. axe; screenshots at 360 px and 1280 px | ✅ 129 passed, 30 skipped by design. All four templates are tested on the homepage, the demo gallery (12 sections, 3 page layouts) and the preview route, and every page is axe-clean and CSP-clean | `verification.txt`, design checkpoint images |
+| Typecheck, lint and build clean | ✅ every page route is ◐ | `verification.txt` |
+| Audit entries written | ✅ every switch writes one `settings.updated` row, by the switching user (asserted) | `template-switch-checksums.json` |
+| Admin-guide page | ✅ `docs/admin-guide/website-templates.md` | |
+| `progress.md` updated; no TODOs without an issue link | ✅ | |
+| **Switching templates changes nothing in the DB** | ✅ 36 tables were compared after each of four switches. Only `site_settings` and `activity_logs` changed, and the settings document came back byte-for-byte identical | `template-switch-checksums.json` |
+| Design approved | ✅ checkpoint answer "Approved, go ahead", recorded as Q8 | `00-decisions.md` |
+
+### Budgets and smoothness (MP §10)
+
+| Measure | Result |
+|---|---|
+| Hero image at 360 px | ✅ AVIF, 2.4 KB with the placeholder photo (budget 200 KB) |
+| Layout shift on load | ✅ 0.000 for the layout; 0.001 including the web-font swap |
+| Throttled phone (Pixel 7, CPU 4× slower, slow 4G), three runs | ✅ LCP 0.84–0.89 s and CLS 0.0003. **No long frame while scrolling.** The slide change produced 51–72 ms frames with at most 7 ms of script, well inside INP 200 ms (`smoothness-android.json`) |
+| First-load JavaScript ≤ 120 KB gzipped | ❌ **147 KB**: 132 KB is Next.js 16 + React 19 before any app code, 15 KB is ours (down from 25 KB). Open decision Q27 |
+
+### Changes against this plan
+
+- **21st.dev studies (your request).** The intuitive patterns adopted are expanding menu groups with pinned actions, a single slideshow capsule, and a progress dot that is the timer. The liquid-glass material is used only on floating controls. Scroll-drawn motion uses CSS timelines on transform only (ADR-016 §8).
+- **Fonts.** next/font's fallbacks assume Arial or Times New Roman, so matched faces for Android and Linux were added (`src/lib/fonts/fallbacks.css`, generated and tested). They cut the font-swap shift from 0.19 to 0.001. The fonts themselves stay on next/font with `swap` (MP §10). Self-hosting with a per-school preload needs new packages and was not done.
+- **JavaScript.** The slideshow island lost tailwind-merge and the icon runtime, and the CSP nonce helper moved to the admin layout. The 120 KB total can't be met by app changes (Q27); E2E holds our part to 20 KB and records the total.
+- **Accessibility fixes found by E2E.** Logo links are now named by their visible text (WCAG 2.5.3). axe waits for the hero entrance, so it never measures contrast mid-fade.
+- **Preview bar.** The preview route shows a slim "Preview of … Nothing here is saved" bar with a link back to Appearance.
+- **Not built:** bespoke versions of every plan §3 signature section. Sections a template doesn't design use token-styled shared renderers, and the approved checkpoint pages show all of them.
