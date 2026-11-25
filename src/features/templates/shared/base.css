@@ -1,0 +1,377 @@
+/*
+ * Shared template layer (ADR-016). Every template's tokens.css overrides the defaults below under
+ * its own [data-template="…"] selector. Brand colours always come from /theme.css (--brand-*):
+ * templates hard-code only neutral tones such as paper and ink.
+ *
+ * Design rules held here (Apple UI typography + the taste skill's motion layer):
+ *  - size-specific tracking and inverse leading; spacing in rem so it follows the visitor's text size
+ *  - feedback on press; hover only on fine pointers; transform and opacity only; no overshoot
+ *  - no scroll-triggered reveals: the hero enters once on load, everything else is still
+ */
+
+[data-template] {
+  --tpl-bg: #ffffff;
+  --tpl-surface: #ffffff;
+  --tpl-surface-alt: var(--brand-primary-50);
+  --tpl-ink: #1b2130;
+  --tpl-ink-muted: #4a5263;
+  --tpl-rule: #dde1e8;
+  --tpl-rule-strong: #b9c0cc;
+  --tpl-brand: var(--brand-primary);
+  --tpl-brand-ink: var(--brand-primary-fg);
+  --tpl-brand-text: var(--brand-primary-text);
+  --tpl-accent: var(--brand-accent);
+  --tpl-accent-ink: var(--brand-accent-fg);
+  --tpl-band: var(--brand-primary-900);
+  --tpl-band-ink: #ffffff;
+  --tpl-band-muted: rgb(255 255 255 / 0.8);
+  --tpl-font-heading: var(--brand-font-heading);
+  --tpl-font-body: var(--brand-font-body);
+  --tpl-radius: var(--brand-radius);
+  --tpl-radius-lg: calc(var(--brand-radius) * 2);
+  --tpl-section-y: calc(5rem * var(--brand-density, 1));
+  --ring: var(--brand-primary-text);
+
+  /* Motion tokens (one UI curve; one entrance curve). */
+  --tpl-ease: cubic-bezier(0.2, 0.8, 0.2, 1);
+  --tpl-ease-enter: cubic-bezier(0.22, 1, 0.36, 1);
+  --tpl-in: 150ms;
+  --tpl-out: 120ms;
+  --tpl-press: 90ms;
+
+  font-family: var(--tpl-font-body);
+  color: var(--tpl-ink);
+  background-color: var(--tpl-bg);
+}
+
+/*
+ * Every rule below lives in Tailwind's `components` layer, beneath utilities, so a template can
+ * adjust a shared class with a utility (`text-[…]`, `py-0`). Unlayered CSS would always win.
+ */
+@layer components {
+  [data-template] :where(h1, h2, h3, h4) {
+    font-family: var(--tpl-font-heading);
+    text-wrap: balance;
+  }
+  [data-template] :where(p) {
+    text-wrap: pretty;
+  }
+  [data-template] :focus-visible {
+    outline: 2px solid var(--ring);
+    outline-offset: 2px;
+  }
+
+  [data-template] .tpl-section {
+    padding-block: var(--tpl-section-y);
+  }
+
+  /* ── Type scale ──────────────────────────────────────────────────────────── */
+  [data-template] .tpl-display {
+    font-family: var(--tpl-font-heading);
+    font-size: clamp(2.25rem, 1.35rem + 3.8vw, 4.5rem);
+    line-height: 1.04;
+    letter-spacing: var(--tpl-display-tracking, -0.025em);
+    font-weight: var(--tpl-display-weight, 600);
+    font-optical-sizing: auto;
+  }
+  [data-template] .tpl-h2 {
+    font-family: var(--tpl-font-heading);
+    font-size: clamp(1.75rem, 1.3rem + 1.8vw, 2.75rem);
+    line-height: 1.12;
+    letter-spacing: var(--tpl-h2-tracking, -0.018em);
+    font-weight: var(--tpl-heading-weight, 600);
+    font-optical-sizing: auto;
+  }
+  [data-template] .tpl-h3 {
+    font-family: var(--tpl-font-heading);
+    font-size: clamp(1.125rem, 1.04rem + 0.35vw, 1.375rem);
+    line-height: 1.3;
+    letter-spacing: -0.008em;
+    font-weight: var(--tpl-heading-weight, 600);
+  }
+  [data-template] .tpl-lede {
+    font-size: clamp(1.0625rem, 1rem + 0.3vw, 1.25rem);
+    line-height: 1.6;
+  }
+  [data-template] .tpl-small {
+    font-size: 0.875rem;
+    line-height: 1.5;
+    letter-spacing: 0.005em;
+  }
+  /* Small label in sentence case: a date, a category. Never an all-caps eyebrow over every heading. */
+  [data-template] .tpl-label {
+    font-size: 0.875rem;
+    line-height: 1.4;
+    font-weight: 600;
+    letter-spacing: 0.01em;
+  }
+
+  /* ── Buttons: step up 1px on hover, sink and scale .985 on press ─────────── */
+  [data-template] .tpl-btn {
+    transition:
+      transform var(--tpl-out) var(--tpl-ease),
+      background-color var(--tpl-out) var(--tpl-ease),
+      color var(--tpl-out) var(--tpl-ease),
+      border-color var(--tpl-out) var(--tpl-ease);
+  }
+  @media (hover: hover) and (pointer: fine) {
+    [data-template] .tpl-btn:hover {
+      transform: translateY(-1px);
+      transition-duration: var(--tpl-in);
+    }
+  }
+  [data-template] .tpl-btn:active {
+    transform: translateY(1px) scale(0.985);
+    transition-duration: var(--tpl-press);
+  }
+
+  /* ── Linked cards lift 2px; their photograph zooms inside its frame ──────── */
+  [data-template] .tpl-card {
+    position: relative;
+    transition:
+      transform 120ms var(--tpl-ease),
+      border-color 120ms var(--tpl-ease);
+  }
+  /* The hover shadow is drawn once and faded with opacity: never an animated box-shadow (repaint). */
+  [data-template] .tpl-card::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    box-shadow: 0 12px 24px -16px rgb(0 0 0 / 0.18);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 120ms var(--tpl-ease);
+  }
+  [data-template] .tpl-zoom {
+    overflow: hidden;
+  }
+  [data-template] .tpl-zoom img {
+    transition: transform 400ms var(--tpl-ease);
+  }
+  @media (hover: hover) and (pointer: fine) {
+    [data-template] .tpl-card:hover {
+      transform: translateY(-2px);
+      border-color: var(--tpl-rule-strong);
+      transition-duration: 180ms;
+    }
+    [data-template] .tpl-card:hover::after {
+      opacity: 1;
+      transition-duration: 180ms;
+    }
+    [data-template] :is(.tpl-card, a):hover .tpl-zoom img,
+    [data-template] a.tpl-zoom:hover img {
+      transform: scale(1.025);
+      transition-duration: 600ms;
+    }
+  }
+
+  /* ── Links: running text rests on a hairline; an ink line draws left to right ─ */
+  [data-template] .tpl-link {
+    background-image:
+      linear-gradient(currentColor, currentColor),
+      linear-gradient(
+        color-mix(in oklab, currentColor 28%, transparent),
+        color-mix(in oklab, currentColor 28%, transparent)
+      );
+    background-size:
+      0% 1px,
+      100% 1px;
+    background-position:
+      0 100%,
+      0 100%;
+    background-repeat: no-repeat;
+    transition: background-size var(--tpl-out) var(--tpl-ease);
+  }
+  @media (hover: hover) and (pointer: fine) {
+    [data-template] .tpl-link:hover {
+      background-size:
+        100% 1px,
+        100% 1px;
+      transition-duration: var(--tpl-in);
+    }
+  }
+  /* Nav and footer words rest bare and draw a line 4px under the word; the current page keeps a 2px bar. */
+  [data-template] .tpl-navword {
+    position: relative;
+  }
+  [data-template] .tpl-navword::after {
+    content: '';
+    position: absolute;
+    inset-inline: 0;
+    bottom: -4px;
+    height: 1px;
+    background: currentColor;
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform var(--tpl-out) var(--tpl-ease);
+  }
+  @media (hover: hover) and (pointer: fine) {
+    [data-template] .tpl-navword:hover::after {
+      transform: scaleX(1);
+      transition-duration: var(--tpl-in);
+    }
+  }
+  [data-template] [aria-current='page'] > .tpl-navword::after,
+  [data-template] .tpl-navword[aria-current='page']::after {
+    height: 2px;
+    transform: scaleX(1);
+  }
+  /* A trailing arrow moves 3px on hover. */
+  [data-template] .tpl-arrow {
+    transition: transform var(--tpl-out) var(--tpl-ease);
+  }
+  @media (hover: hover) and (pointer: fine) {
+    [data-template] :is(a, button):hover .tpl-arrow {
+      transform: translateX(3px);
+      transition-duration: var(--tpl-in);
+    }
+  }
+
+  /* ── Material: translucent chrome on capable devices; solid on phones and on request ─
+   * A backdrop blur is recomputed on every scroll frame. Mid-range Android phones (the primary
+   * device, MP §1) drop frames on it, so touch devices get a near-opaque surface instead, and
+   * desktops get a modest 12px blur (the skill's limit for blur is 20px). */
+  [data-template] .tpl-material {
+    background-color: color-mix(in oklab, var(--tpl-surface) 96%, transparent);
+  }
+  @media (hover: hover) and (pointer: fine) and (prefers-reduced-transparency: no-preference) and (prefers-contrast: no-preference) {
+    @supports ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+      [data-template] .tpl-material {
+        background-color: color-mix(in oklab, var(--tpl-surface) 82%, transparent);
+        -webkit-backdrop-filter: blur(12px) saturate(160%);
+        backdrop-filter: blur(12px) saturate(160%);
+      }
+    }
+  }
+  @media (prefers-reduced-transparency: reduce), (prefers-contrast: more) {
+    [data-template] .tpl-material {
+      background-color: var(--tpl-surface);
+    }
+  }
+  /* Scroll edge: a hairline and soft shadow appear once content is under the sticky header. The
+   * edge is drawn once on a pseudo-element and faded in with opacity by a scroll timeline, so it runs
+   * on the compositor; animating box-shadow itself would repaint on every scroll frame. */
+  [data-template] .tpl-scroll-edge::after {
+    content: '';
+    position: absolute;
+    inset-inline: 0;
+    top: 100%;
+    height: 0.75rem;
+    border-top: 1px solid rgb(0 0 0 / 0.07);
+    background: linear-gradient(rgb(0 0 0 / 0.07), transparent);
+    opacity: 0;
+    pointer-events: none;
+  }
+  @supports (animation-timeline: scroll()) {
+    [data-template] .tpl-scroll-edge::after {
+      animation: tpl-scroll-edge linear both;
+      animation-timeline: scroll(root);
+      animation-range: 0 6rem;
+    }
+  }
+
+  /* ── Menus: open from their trigger with a 6px drop in 200ms; close in 120ms ─ */
+  [data-template] .tpl-pop {
+    transform-origin: var(--tpl-pop-origin, top right);
+    transition:
+      opacity 200ms var(--tpl-ease),
+      transform 200ms var(--tpl-ease);
+  }
+  @starting-style {
+    [data-template] details[open] > .tpl-pop {
+      opacity: 0;
+      transform: translateY(-6px);
+    }
+  }
+
+  /* ── Hero entrance, once on load: the h1 rises line by line, then the rest fades up 12px ─ */
+  [data-template] .tpl-enter-line {
+    display: inline-block;
+    overflow: clip;
+    overflow-clip-margin: 0.15em;
+    vertical-align: top;
+  }
+  [data-template] .tpl-enter-line > span {
+    display: inline-block;
+    animation: tpl-rise 700ms var(--tpl-ease-enter) both;
+    animation-delay: calc(var(--tpl-line, 0) * 80ms);
+  }
+  [data-template] .tpl-enter-fade {
+    animation: tpl-fade-up 600ms var(--tpl-ease-enter) both;
+    animation-delay: calc(240ms + var(--tpl-step, 0) * 80ms);
+  }
+  @media (prefers-reduced-motion: reduce) {
+    [data-template] .tpl-enter-line > span,
+    [data-template] .tpl-enter-fade {
+      animation: none;
+    }
+    [data-template] .tpl-pop {
+      transition: opacity 150ms ease-out;
+    }
+  }
+
+  /* ── Rich text from the CMS (static renderer output, never raw HTML) ─────── */
+  .tpl-prose {
+    line-height: 1.7;
+  }
+  .tpl-prose > * + * {
+    margin-top: 1em;
+  }
+  .tpl-prose :where(h2, h3, h4) {
+    margin-top: 1.6em;
+    line-height: 1.25;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+  }
+  .tpl-prose h2 {
+    font-size: 1.5rem;
+  }
+  .tpl-prose h3 {
+    font-size: 1.25rem;
+  }
+  .tpl-prose :where(ul, ol) {
+    padding-left: 1.25rem;
+  }
+  .tpl-prose ul {
+    list-style: disc;
+  }
+  .tpl-prose ol {
+    list-style: decimal;
+  }
+  .tpl-prose li + li {
+    margin-top: 0.35em;
+  }
+  .tpl-prose a {
+    color: var(--tpl-brand-text);
+    text-decoration: underline;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 0.2em;
+  }
+  .tpl-prose blockquote {
+    border-left: 2px solid var(--tpl-brand);
+    padding-left: 1rem;
+  }
+
+  /* The phone menu is full screen; the page behind it stays put (no script needed). */
+  html:has(details[data-tpl-menu='mobile'][open]) {
+    overflow: hidden;
+  }
+}
+
+@keyframes tpl-scroll-edge {
+  to {
+    opacity: 1;
+  }
+}
+@keyframes tpl-rise {
+  from {
+    transform: translateY(105%);
+  }
+}
+@keyframes tpl-fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+}

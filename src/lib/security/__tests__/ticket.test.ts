@@ -8,6 +8,7 @@ beforeEach(() => {
   vi.stubEnv('CRON_SECRET', 'c'.repeat(40));
   vi.stubEnv('FORM_SIGNING_SECRET', SECRET);
   vi.stubEnv('IP_HASH_SALT', 's'.repeat(40));
+  vi.stubEnv('PREVIEW_TOKEN_SECRET', 'p'.repeat(40));
 });
 afterEach(() => {
   vi.unstubAllEnvs();

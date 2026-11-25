@@ -46,7 +46,7 @@ export const serverEnvSchema = z.object({
   EMAIL_ADMISSIONS_INBOX: z.email().optional(), // phase 12
   RESEND_WEBHOOK_SECRET: z.string().optional(), // phase 14
   CRON_SECRET: secret(), // phase 2: also authenticates internal job calls (spec D13)
-  PREVIEW_TOKEN_SECRET: secret().optional(), // phase 4
+  PREVIEW_TOKEN_SECRET: secret(), // phase 3: signs template preview links (spec §6.4)
   FORM_SIGNING_SECRET: secret(), // spec D5; must equal Vault secret form_signing_secret
   IP_HASH_SALT: secret(), // spec D10
   SENTRY_DSN: z.url().optional(),

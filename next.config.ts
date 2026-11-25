@@ -32,6 +32,10 @@ const config: NextConfig = {
   },
   images: {
     formats: ['image/avif', 'image/webp'],
+    // Next refuses to optimise images from private IPs (SSRF protection). Only the local Supabase
+    // stack (dev and CI) lives on loopback; a school's real project is a public supabase.co host,
+    // so production keeps the protection. remotePatterns below still pins the one allowed host.
+    dangerouslyAllowLocalIP: ['127.0.0.1', 'localhost'].includes(supabaseUrl.hostname),
     remotePatterns: [
       {
         protocol: supabaseUrl.protocol.replace(':', '') as 'http' | 'https',
