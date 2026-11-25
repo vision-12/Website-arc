@@ -63,7 +63,7 @@ export const enGB = {
     mainNav: 'Main',
     footerNav: 'Footer',
     menu: 'Menu',
-    closeMenu: 'Close menu',
+    closeMenu: 'Close',
     submenu: '{label} pages',
     home: 'Home page',
     apply: 'Apply',
@@ -82,6 +82,8 @@ export const enGB = {
     applicationsClose: 'Applications for {name} close on {date}',
     applicationsClosed: 'Applications are not open at the moment',
     contactUs: 'Contact the school',
+    callSchool: 'Call the school',
+    emailSchool: 'Email the school',
     phone: 'Phone',
     email: 'Email',
     address: 'Address',
@@ -92,6 +94,8 @@ export const enGB = {
     breadcrumb: 'Breadcrumb',
     inThisSection: 'In this section',
     quoteBy: 'Quote from {name}',
+    founded: 'Founded {year}',
+    visit: 'Visit the school',
   },
 } as const;
 

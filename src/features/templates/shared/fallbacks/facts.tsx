@@ -56,9 +56,10 @@ export function FallbackStatistics({ id, data }: SectionProps<'statistics'>) {
         {data.heading ? <SectionHeading id={id} title={data.heading} tone="band" /> : null}
         <dl
           className={cn(
-            'grid gap-x-10 gap-y-12 sm:grid-cols-2',
-            data.items.length >= 3 && 'lg:grid-cols-3',
-            data.items.length === 4 && 'xl:grid-cols-4',
+            // Two columns from the smallest phones, so four numbers take two rows, not four.
+            'grid grid-cols-2 gap-x-6 gap-y-10 sm:gap-x-10 sm:gap-y-12',
+            data.items.length === 3 && 'lg:grid-cols-3',
+            data.items.length >= 4 && 'lg:grid-cols-4',
           )}
         >
           {data.items.map((item) => (
@@ -67,7 +68,7 @@ export function FallbackStatistics({ id, data }: SectionProps<'statistics'>) {
               className="flex flex-col-reverse border-t border-tpl-band-ink/25 pt-6"
             >
               <dt className="mt-3 text-tpl-band-muted">{item.label}</dt>
-              <dd className="font-tpl-heading text-5xl leading-none font-semibold tracking-tight sm:text-6xl">
+              <dd className="font-tpl-heading text-[2.5rem] leading-none font-semibold tracking-tight sm:text-6xl">
                 {item.value}
               </dd>
             </div>

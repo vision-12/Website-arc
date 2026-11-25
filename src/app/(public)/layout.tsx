@@ -1,5 +1,8 @@
 import '@/features/templates/shared/base.css';
 import '@/features/templates/institutional-classic/tokens.css';
+import '@/features/templates/modern-academic/tokens.css';
+import '@/features/templates/heritage-prestige/tokens.css';
+import '@/features/templates/contemporary-community/tokens.css';
 import { SkipLink } from '@/components/shared/skip-link';
 import { getSiteSettings } from '@/features/cms/settings/queries';
 import { getTemplate } from '@/features/templates/registry';

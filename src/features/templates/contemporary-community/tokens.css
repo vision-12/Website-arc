@@ -1,0 +1,22 @@
+/*
+ * Contemporary Community: warm, friendly, busy with activity. Warm off-white, a soft tint from the
+ * school's accent colour, large radii, bold headings.
+ */
+[data-template='contemporary-community'] {
+  --tpl-bg: #fffaf4;
+  --tpl-surface: #ffffff;
+  --tpl-surface-alt: color-mix(in oklab, var(--brand-accent) 11%, #fff3e5);
+  --tpl-ink: #1f1915;
+  --tpl-ink-muted: #59504a;
+  --tpl-rule: #eee1d1;
+  --tpl-rule-strong: #d2bea7;
+  --tpl-band: color-mix(in oklab, var(--brand-primary-900) 78%, #1f140e);
+  --tpl-radius: max(var(--brand-radius), 0.875rem);
+  --tpl-radius-lg: max(calc(var(--brand-radius) * 2), 1.5rem);
+  --tpl-display-tracking: -0.028em;
+  --tpl-h2-tracking: -0.02em;
+  --tpl-heading-weight: 700;
+  --tpl-display-weight: 700;
+  --tpl-section-y: calc(5rem * var(--brand-density, 1));
+  --tpl-header-h: 4.5rem;
+}

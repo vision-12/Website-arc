@@ -222,7 +222,7 @@ export function demoSectionData(): { [K in HomeSectionType]: SectionData[K] } {
       openIntake: {
         name: 'Senior one, 2027',
         href: '/admissions/apply/s1-2027',
-        closesAt: '2026-12-12T21:00:00Z',
+        closesAt: '2026-12-12T18:00:00Z',
       },
       cta: { label: 'Start an application', href: '/admissions/apply/s1-2027', external: false },
     },

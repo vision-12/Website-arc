@@ -76,6 +76,7 @@
   --color-tpl-ink: var(--tpl-ink);
   --color-tpl-ink-muted: var(--tpl-ink-muted);
   --color-tpl-rule: var(--tpl-rule);
+  --color-tpl-rule-strong: var(--tpl-rule-strong);
   --color-tpl-brand: var(--tpl-brand);
   --color-tpl-brand-ink: var(--tpl-brand-ink);
   --color-tpl-brand-text: var(--tpl-brand-text);

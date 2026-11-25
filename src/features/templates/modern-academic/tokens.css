@@ -1,0 +1,46 @@
+/*
+ * Modern Academic: spacious, editorial, photographic. Cool white, generous section spacing,
+ * tightly tracked sans display type, a near-black band for the footer.
+ */
+[data-template='modern-academic'] {
+  --tpl-bg: #ffffff;
+  --tpl-surface: #ffffff;
+  --tpl-surface-alt: #f3f4f6;
+  --tpl-ink: #101318;
+  --tpl-ink-muted: #545b66;
+  --tpl-rule: #e3e6eb;
+  --tpl-rule-strong: #b8bec8;
+  --tpl-band: #0f1216;
+  --tpl-band-ink: #ffffff;
+  --tpl-band-muted: rgb(255 255 255 / 0.74);
+  --tpl-radius: min(var(--brand-radius), 0.75rem);
+  --tpl-radius-lg: min(calc(var(--brand-radius) * 2), 1.25rem);
+  --tpl-display-tracking: -0.035em;
+  --tpl-h2-tracking: -0.025em;
+  --tpl-heading-weight: 600;
+  --tpl-section-y: calc(6.5rem * var(--brand-density, 1));
+  --tpl-header-h: 4.25rem;
+}
+
+/*
+ * The page's one moment: the introduction photograph settles as it scrolls into view (scale only,
+ * on the compositor, inside its own frame). Nothing else moves with the scroll; reduced motion and
+ * browsers without view timelines simply show it at rest.
+ */
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    [data-template='modern-academic'] .ma-develop img {
+      animation: ma-develop linear both;
+      animation-timeline: view();
+      animation-range: entry 0% cover 45%;
+    }
+  }
+}
+@keyframes ma-develop {
+  from {
+    transform: scale(1.08);
+  }
+  to {
+    transform: scale(1);
+  }
+}

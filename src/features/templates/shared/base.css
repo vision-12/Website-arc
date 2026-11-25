@@ -68,6 +68,7 @@
   /* ── Type scale ──────────────────────────────────────────────────────────── */
   [data-template] .tpl-display {
     font-family: var(--tpl-font-heading);
+    text-wrap: balance;
     font-size: clamp(2.25rem, 1.35rem + 3.8vw, 4.5rem);
     line-height: 1.04;
     letter-spacing: var(--tpl-display-tracking, -0.025em);
@@ -271,6 +272,99 @@
     }
   }
 
+  /* ── Liquid glass: the floating control layer only (headers, control capsules, menus) ─────
+   * Studied from 21st.dev's liquid-glass components and Apple's material guidance. What makes it
+   * read as glass is cheap and portable: a tint, a blur with a saturation boost, a specular rim
+   * brighter at the top, and a soft shadow. Their refraction (an SVG displacement map through
+   * backdrop-filter: url()) runs only in Chromium and costs every frame, so it is left out. Touch
+   * devices get the same edges over a firmer tint with no blur (see .tpl-material). */
+  [data-template] .tpl-glass {
+    --tpl-glass-tint: var(--tpl-surface);
+    --tpl-glass-alpha: 94%;
+    --tpl-glass-alpha-blur: 66%;
+    --tpl-glass-edge: rgb(255 255 255 / 0.85);
+    --tpl-glass-rim: rgb(255 255 255 / 0.3);
+    --tpl-glass-line: rgb(16 24 40 / 0.08);
+    --tpl-glass-shadow: rgb(16 24 40 / 0.2);
+    position: relative;
+    isolation: isolate;
+    background-color: color-mix(
+      in oklab,
+      var(--tpl-glass-tint) var(--tpl-glass-alpha),
+      transparent
+    );
+    box-shadow:
+      inset 0 0 0 1px var(--tpl-glass-line),
+      0 1px 2px rgb(16 24 40 / 0.06),
+      var(--tpl-glass-depth, 0 16px 36px -20px var(--tpl-glass-shadow));
+  }
+  /* The specular rim: a 1px gradient border, bright where light catches the top edge. */
+  [data-template] .tpl-glass::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    padding: 1px;
+    border-radius: inherit;
+    background: linear-gradient(
+      170deg,
+      var(--tpl-glass-edge),
+      transparent 42%,
+      transparent 70%,
+      var(--tpl-glass-rim)
+    );
+    -webkit-mask:
+      linear-gradient(#000 0 0) content-box,
+      linear-gradient(#000 0 0);
+    -webkit-mask-composite: xor;
+    mask:
+      linear-gradient(#000 0 0) content-box exclude,
+      linear-gradient(#000 0 0);
+    pointer-events: none;
+  }
+  /* Dark glass for controls that sit on photographs. */
+  [data-template] .tpl-glass-dark {
+    --tpl-glass-tint: rgb(16 17 20);
+    --tpl-glass-alpha: 62%;
+    --tpl-glass-alpha-blur: 40%;
+    --tpl-glass-edge: rgb(255 255 255 / 0.42);
+    --tpl-glass-rim: rgb(255 255 255 / 0.14);
+    --tpl-glass-line: rgb(255 255 255 / 0.1);
+    --tpl-glass-shadow: rgb(0 0 0 / 0.5);
+    color: #fff;
+  }
+  /* Menus carry running text, so they keep a firmer tint over the page. */
+  [data-template] .tpl-glass-menu {
+    --tpl-glass-alpha-blur: 84%;
+    --tpl-glass-depth: 0 24px 48px -18px rgb(16 24 40 / 0.3);
+  }
+  @media (hover: hover) and (pointer: fine) and (prefers-reduced-transparency: no-preference) and (prefers-contrast: no-preference) {
+    @supports ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+      [data-template] .tpl-glass {
+        background-color: color-mix(
+          in oklab,
+          var(--tpl-glass-tint) var(--tpl-glass-alpha-blur),
+          transparent
+        );
+        -webkit-backdrop-filter: blur(14px) saturate(180%);
+        backdrop-filter: blur(14px) saturate(180%);
+      }
+    }
+  }
+  @media (prefers-reduced-transparency: reduce), (prefers-contrast: more) {
+    [data-template] .tpl-glass {
+      background-color: var(--tpl-glass-tint);
+    }
+  }
+  @media (prefers-contrast: more) {
+    [data-template] .tpl-glass {
+      box-shadow: inset 0 0 0 1px currentColor;
+    }
+    [data-template] .tpl-glass::before {
+      display: none;
+    }
+  }
+
   /* ── Menus: open from their trigger with a 6px drop in 200ms; close in 120ms ─ */
   [data-template] .tpl-pop {
     transform-origin: var(--tpl-pop-origin, top right);
@@ -359,6 +453,15 @@
   }
 }
 
+/* The slideshow's progress: the active dot fills while its slide shows (transform only). */
+@keyframes tpl-fill {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
+  }
+}
 @keyframes tpl-scroll-edge {
   to {
     opacity: 1;

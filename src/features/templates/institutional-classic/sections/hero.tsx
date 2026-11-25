@@ -27,7 +27,7 @@ export function InstitutionalHero({ data, schoolNameAsH1 }: SectionProps<'hero'>
         <HeroCarousel
           autoplaySeconds={data.autoplaySeconds}
           labels={heroLabels()}
-          controlsClassName="absolute right-4 top-4 sm:right-6 lg:bottom-8 lg:right-8 lg:top-auto"
+          controlsClassName="absolute inset-x-0 top-4 mx-auto max-w-6xl justify-end px-4 sm:top-6 sm:px-6 lg:top-auto lg:bottom-8 lg:px-8"
         >
           {slides}
         </HeroCarousel>

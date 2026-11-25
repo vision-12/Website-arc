@@ -1,0 +1,79 @@
+/*
+ * Heritage & Prestige: elegant and historic. Parchment ground with a muted tint derived from the
+ * school's own colour, square corners, lighter serif headings, a warm deep band.
+ */
+[data-template='heritage-prestige'] {
+  --tpl-bg: #f6f1e7;
+  --tpl-surface: #fffdf8;
+  --tpl-surface-alt: color-mix(in oklab, var(--brand-primary) 7%, #eee6d6);
+  --tpl-ink: #241f19;
+  --tpl-ink-muted: #594f44;
+  --tpl-rule: #d8cdb9;
+  --tpl-rule-strong: #ad9f86;
+  --tpl-band: color-mix(in oklab, var(--brand-primary-900) 70%, #1c1711);
+  --tpl-band-ink: #fbf6ec;
+  --tpl-band-muted: rgb(251 246 236 / 0.78);
+  --tpl-radius: 0px;
+  --tpl-radius-lg: 0px;
+  --tpl-display-tracking: -0.012em;
+  --tpl-h2-tracking: -0.006em;
+  --tpl-heading-weight: 500;
+  --tpl-display-weight: 500;
+  --tpl-section-y: calc(5.5rem * var(--brand-density, 1));
+  --tpl-header-h: 4.75rem;
+}
+
+/*
+ * The page's one moment, adapted from the scroll-drawn timelines on 21st.dev: the milestone line
+ * draws itself in the school's colour as the timeline scrolls into view. Theirs grow a height from
+ * JavaScript on every scroll frame (layout work); this scales one line on the compositor from a
+ * view timeline. Without view timelines, or under reduced motion, the line is simply drawn.
+ */
+[data-template='heritage-prestige'] .hp-timeline::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: -1.5px;
+  width: 2px;
+  background: var(--tpl-brand);
+  transform-origin: top;
+}
+@media (min-width: 64rem) {
+  [data-template='heritage-prestige'] .hp-timeline::before {
+    top: -1.5px;
+    right: 0;
+    bottom: auto;
+    left: 0;
+    width: auto;
+    height: 2px;
+    transform-origin: left;
+  }
+}
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    [data-template='heritage-prestige'] .hp-timeline {
+      view-timeline: --hp-line block;
+    }
+    [data-template='heritage-prestige'] .hp-timeline::before {
+      animation: hp-draw-y linear both;
+      animation-timeline: --hp-line;
+      animation-range: entry 15% cover 55%;
+    }
+    @media (min-width: 64rem) {
+      [data-template='heritage-prestige'] .hp-timeline::before {
+        animation-name: hp-draw-x;
+      }
+    }
+  }
+}
+@keyframes hp-draw-y {
+  from {
+    transform: scaleY(0);
+  }
+}
+@keyframes hp-draw-x {
+  from {
+    transform: scaleX(0);
+  }
+}

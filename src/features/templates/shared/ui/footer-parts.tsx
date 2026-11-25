@@ -40,13 +40,29 @@ export function ContactList({ shell, className }: { shell: ShellData; className?
       {contact.emails.map((email) => (
         <li key={email.address} className="flex gap-3">
           <Mail aria-hidden="true" className="mt-1 size-4 shrink-0 opacity-70" />
-          <SmartLink href={`mailto:${email.address}`} className="tpl-navword min-h-6 break-all">
+          <SmartLink
+            href={`mailto:${email.address}`}
+            className="tpl-navword min-h-6 [overflow-wrap:anywhere]"
+          >
             <span className="sr-only">{email.label || t('site.email')}: </span>
-            {email.address}
+            <EmailText address={email.address} />
           </SmartLink>
         </li>
       ))}
     </ul>
+  );
+}
+
+/** An address that may wrap after its @ (the typographic break), never in the middle of a word. */
+function EmailText({ address }: { address: string }) {
+  const at = address.indexOf('@');
+  if (at < 1) return address;
+  return (
+    <>
+      {address.slice(0, at + 1)}
+      <wbr />
+      {address.slice(at + 1)}
+    </>
   );
 }
 
