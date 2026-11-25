@@ -1,6 +1,6 @@
 # Phase 4 — CMS core (plan)
 
-**Status:** **Awaiting approval.**
+**Status:** **In progress.** Plan approved 25 Nov 2026 (P4-A … P4-L as recommended; Q4, Q10 and Q24 confirmed).
 **Inputs:**
 - MP §5 (shared content lifecycle), §5.9 (Pages & CMS), §5.10 (Admin dashboard), §7.4 (storage), §7.5 (rich text), §11 (admin UX) and §12 (Phase 4 prompt, Definition of Done)
 - Spec D2–D4, D7, D12, §1.3–1.4, §2.3, §3.1, §3.4, §3.9, §4.0–4.2, §4.8, §5.0, §5.1 (`/[...slug]`, `/about`, `/legal`), §5.4 (`/admin/overview`, `/admin/pages`, `/admin/media`, `/admin/trash`), §8
