@@ -128,7 +128,8 @@ file_size_limit = "50MiB"
 [storage.buckets.media]
 public = true
 file_size_limit = "20MiB"
-allowed_mime_types = ["image/jpeg", "image/png", "image/webp", "image/avif", "image/gif", "image/svg+xml", "application/pdf"]
+# No SVG until it can be sanitised (Phase 4 plan P4-G); keep in step with migration 20261126000100.
+allowed_mime_types = ["image/jpeg", "image/png", "image/webp", "image/avif", "image/gif", "application/pdf"]
 objects_path = "./seed/media"
 
 # Allow connections via S3 compatible clients

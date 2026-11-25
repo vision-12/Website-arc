@@ -1,5 +1,5 @@
 begin;
-select plan(10);
+select plan(16);
 create temp table u on commit drop as select
   tests.create_user('sa@example.test', 'super_admin') as sa,
   tests.create_user('ce@example.test', 'content_editor') as ce,
@@ -45,6 +45,31 @@ select lives_ok($$update public.pages set deleted_at = now() where slug = 'schoo
 delete from public.pages where slug = 'school-fees';
 select tests.as_system();
 select is((select count(*)::int from public.pages where slug = 'school-fees'), 1, 'only trash.purge can permanently delete');
+
+-- Scheduling and cancelling (plan §4, P4-A). Approval is still on here.
+insert into public.pages (title, slug, status, publish_at) values ('Open day', 'open-day', 'scheduled', now() + interval '2 days');
+select tests.authenticate_as((select ce from u));
+select throws_ok($$update public.pages set status = 'draft' where slug = 'open-day'$$,
+  '42501', 'TRANSITION_DENIED', 'with approval on, the content editor cannot cancel a schedule');
+select tests.as_system();
+select tests.authenticate_as((select ht from u));
+select lives_ok($$update public.pages set status = 'draft' where slug = 'open-day'$$, 'the headteacher cancels it');
+select tests.as_system();
+
+select tests.set_feature('contentApproval', false);
+select tests.authenticate_as((select ce from u));
+select lives_ok($$update public.pages set status = 'scheduled', publish_at = now() + interval '1 day' where slug = 'open-day'$$,
+  'with approval off, the content editor schedules a page');
+select lives_ok($$update public.pages set status = 'draft' where slug = 'open-day'$$, '... and cancels the schedule');
+select tests.as_system();
+
+-- Restore brings back the status the item had when it was trashed.
+insert into public.pages (title, slug, status, publish_at) values ('Uniform', 'uniform', 'published', now());
+select tests.authenticate_as((select ce from u));
+update public.pages set deleted_at = now() where slug = 'uniform';
+select lives_ok($$update public.pages set deleted_at = null where slug = 'uniform'$$, 'the content editor restores a trashed page');
+select is((select status::text from public.pages where slug = 'uniform'), 'published', 'it comes back published, as it was');
+select tests.as_system();
 
 select * from finish();
 rollback;

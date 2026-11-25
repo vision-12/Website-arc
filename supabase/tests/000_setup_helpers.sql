@@ -40,6 +40,13 @@ begin
   perform set_config('request.jwt.claims', '', true);
 end $$;
 
+-- Act as the service role (cron jobs and webhooks use the secret key).
+create or replace function tests.as_service() returns void language plpgsql set search_path = '' as $$
+begin
+  perform set_config('request.jwt.claims', '{"role":"service_role"}', true);
+  execute 'set local role service_role';
+end $$;
+
 -- One row of every sensitive kind, created as the system (bypassing RLS). Returns ids by name.
 create or replace function tests.seed_fixtures() returns jsonb language plpgsql security definer set search_path = '' as $$
 declare

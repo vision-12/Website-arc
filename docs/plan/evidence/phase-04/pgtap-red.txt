@@ -1,0 +1,116 @@
+# pgTAP red run: new Phase 4 tests BEFORE migration 20261126000100_cms_core.sql (2026-11-25T21:33:32Z)
+/home/user/Website-arc/supabase/tests/30_lifecycle.sql ............ ok
+/home/user/Website-arc/supabase/tests/31_append_only.sql .......... ok
+/home/user/Website-arc/supabase/tests/32_audit_trail.sql .......... ok
+psql:/home/user/Website-arc/supabase/tests/33_content_drafts.sql:31: ERROR:  function public.content_editors(unknown, unknown) does not exist
+LINE 1: select is((select count(*)::int from public.content_editors(...
+                                             ^
+HINT:  No function matches the given name and argument types. You might need to add explicit type casts.
+/home/user/Website-arc/supabase/tests/33_content_drafts.sql ....... 
+# Failed test 2: "a second person editing the same page gets a copy of their own, not an overwrite"
+#     died: 23505: duplicate key value violates unique constraint "content_drafts_pkey"
+#         SCHEMA:     public
+#         TABLE:      content_drafts
+#         CONSTRAINT: content_drafts_pkey
+#         CONTEXT:
+#             SQL statement "insert into public.content_drafts (entity_type, entity_id, data, base_version, updated_by)
+#               values ('pages', '33000000-0000-4000-8000-000000000001', '{"title":"Admin text"}', 1, (select adm from u))"
+#             PL/pgSQL function lives_ok(text,text) line 14 at EXECUTE
+Dubious, test returned 3 (wstat 768, 0x300)
+Failed 7/10 subtests 
+psql:/home/user/Website-arc/supabase/tests/34_media_usages.sql:73: ERROR:  column "confirmed_at" does not exist
+LINE 1: select is((select confirmed_at from public.media_assets wher...
+                          ^
+/home/user/Website-arc/supabase/tests/34_media_usages.sql ......... 
+# Failed test 2: "the photo is recorded as used in the page body"
+#         have: NULL
+#         want: {34000000-0000-4000-8000-0000000000a1}
+# Failed test 3: "the searchable text is derived from the body"
+#         have: 
+#         want: Welcome to the library
+# Failed test 4: "a photo without a description cannot be saved into the page text"
+#       caught: no exception
+#       wanted: 23514
+# Failed test 5: "... nor used as the cover"
+#       caught: no exception
+#       wanted: 23514
+# Failed test 7: "usages follow the edit: the removed photo is released, the PDF and cover are recorded"
+#         have: NULL
+#         want: {body:34000000-0000-4000-8000-0000000000a3,cover:34000000-0000-4000-8000-0000000000a1}
+# Failed test 8: "a photo used on a page cannot be moved to Trash"
+#       caught: no exception
+#       wanted: 23503
+# Failed test 9: "a photo used on a page cannot lose its description"
+#       caught: no exception
+#       wanted: 23514
+# Failed test 10: "visitors cannot see an upload the server has not checked"
+#         have: 1
+#         want: 0
+Dubious, test returned 3 (wstat 768, 0x300)
+Failed 13/15 subtests 
+psql:/home/user/Website-arc/supabase/tests/35_publish_due.sql:10: ERROR:  function "public.publish_due_content()" does not exist
+/home/user/Website-arc/supabase/tests/35_publish_due.sql .......... 
+# Failed test 1: "publish_due_content() exists"
+Dubious, test returned 3 (wstat 768, 0x300)
+Failed 12/12 subtests 
+/home/user/Website-arc/supabase/tests/36_pages_tree.sql ........... 
+# Failed test 1: "a page with sub-pages cannot be moved to Trash"
+#       caught: no exception
+#       wanted: 22023
+# Failed test 2: "a page cannot be moved inside its own sub-page"
+#       caught: no exception
+#       wanted: 22023
+# Failed test 5: "a sub-page cannot be restored while its parent is in Trash"
+#       caught: no exception
+#       wanted: 22023
+# Failed test 9: "people cannot create built-in pages"
+#       caught: no exception
+#       wanted: 42501
+# Failed test 10: "the content editor reorders top-level pages"
+#     died: 42883: function public.reorder_pages(unknown, uuid[]) does not exist
+#         HINT:       No function matches the given name and argument types. You might need to add explicit type casts.
+#         CONTEXT:
+#             PL/pgSQL function lives_ok(text,text) line 14 at EXECUTE
+# Failed test 11: "... and the order changed"
+# Failed test 12: "even a super administrator cannot trash a built-in page"
+#       caught: no exception
+#       wanted: 22023
+# Failed test 13: "or change its address"
+#       caught: no exception
+#       wanted: 22023
+# Looks like you failed 8 tests of 13
+Failed 8/13 subtests 
+psql:/home/user/Website-arc/supabase/tests/37_dashboard.sql:13: ERROR:  function "public.get_dashboard_counts()" does not exist
+/home/user/Website-arc/supabase/tests/37_dashboard.sql ............ 
+Dubious, test returned 3 (wstat 768, 0x300)
+Failed 11/11 subtests 
+/home/user/Website-arc/supabase/tests/40_submit_application.sql ... 
+# Failed (TODO) test 1: "submit_application rejects a client-supplied status"
+# Failed (TODO) test 2: "submit_application rejects a client-supplied reference"
+ok
+/home/user/Website-arc/supabase/tests/41_reference.sql ............ ok
+/home/user/Website-arc/supabase/tests/44_storage_staff.sql ........ ok
+/home/user/Website-arc/supabase/tests/45_auth_admin_jobs.sql ...... ok
+
+Test Summary Report
+-------------------
+/home/user/Website-arc/supabase/tests/33_content_drafts.sql     (Wstat: 768 (exited 3) Tests: 4 Failed: 1)
+  Failed test:  2
+  Non-zero exit status: 3
+  Parse errors: Bad plan.  You planned 10 tests but ran 4.
+/home/user/Website-arc/supabase/tests/34_media_usages.sql       (Wstat: 768 (exited 3) Tests: 10 Failed: 8)
+  Failed tests:  2-5, 7-10
+  Non-zero exit status: 3
+  Parse errors: Bad plan.  You planned 15 tests but ran 10.
+/home/user/Website-arc/supabase/tests/35_publish_due.sql        (Wstat: 768 (exited 3) Tests: 1 Failed: 1)
+  Failed test:  1
+  Non-zero exit status: 3
+  Parse errors: Bad plan.  You planned 12 tests but ran 1.
+/home/user/Website-arc/supabase/tests/36_pages_tree.sql         (Wstat: 0 Tests: 13 Failed: 8)
+  Failed tests:  1-2, 5, 9-13
+/home/user/Website-arc/supabase/tests/37_dashboard.sql          (Wstat: 768 (exited 3) Tests: 0 Failed: 0)
+  Non-zero exit status: 3
+  Parse errors: Bad plan.  You planned 11 tests but ran 0.
+Files=25, Tests=166,  2 wallclock secs ( 0.06 usr  0.02 sys +  0.19 cusr  0.04 csys =  0.31 CPU)
+Result: FAIL
+error running container: exit 1
