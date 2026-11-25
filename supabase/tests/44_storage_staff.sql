@@ -11,13 +11,13 @@ select is((select public from storage.buckets where id = 'media'), true, 'media 
 select is((select public from storage.buckets where id = 'resources'), true, 'resources bucket is public-read');
 
 select tests.authenticate_as((select ce from u));
-select is(tests.visible_rows('storage.objects'), 0, 'content editor cannot see admission documents');
+select is(tests.visible_rows('storage.objects', $$bucket_id = 'admission-documents'$$), 0, 'content editor cannot see admission documents');
 select tests.as_system();
 select tests.authenticate_as((select ao from u), 'aal1');
-select is(tests.visible_rows('storage.objects'), 0, 'admissions officer without MFA cannot see admission documents');
+select is(tests.visible_rows('storage.objects', $$bucket_id = 'admission-documents'$$), 0, 'admissions officer without MFA cannot see admission documents');
 select tests.as_system();
 select tests.authenticate_as((select ao from u), 'aal2');
-select is(tests.visible_rows('storage.objects'), 1, 'admissions officer with MFA can see admission documents (for signed URLs)');
+select is(tests.visible_rows('storage.objects', $$bucket_id = 'admission-documents'$$), 1, 'admissions officer with MFA can see admission documents (for signed URLs)');
 
 select * from finish();
 rollback;

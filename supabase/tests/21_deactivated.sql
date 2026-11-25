@@ -11,7 +11,7 @@ select is((select count(*)::int from public.permissions p where public.has_permi
   'a deactivated user holds no permission at all');
 select is(tests.visible_rows('public.applications'), 0, 'deactivated user reads no applications');
 select is(tests.visible_rows('public.activity_logs'), 0, 'deactivated user reads no logs');
-select is(tests.visible_rows('public.pages'), 1, 'deactivated user sees only what the public sees');
+select is(tests.visible_rows('public.pages', $$slug in ('draft-page', 'live-page', 'future-page')$$), 1, 'deactivated user sees only what the public sees');
 select throws_ok($$insert into public.pages (title, slug) values ('x', 'x')$$, '42501', null, 'deactivated user cannot write');
 
 select * from finish();
