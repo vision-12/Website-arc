@@ -58,6 +58,19 @@ export const enGB = {
     placeholderTitle: 'This website is being prepared',
     placeholderBody: 'Please check back soon.',
   },
+  /** Template preview links (spec §6.4). */
+  preview: {
+    title: 'Template preview',
+    bar: 'Preview of {template}. Nothing here is saved.',
+    backToAppearance: 'Back to Appearance',
+    invalidTitle: 'This preview link does not work',
+    invalidBody:
+      'Open the preview again from the Appearance page. Links work only for the person who opened them.',
+    expiredTitle: 'This preview link has expired',
+    expiredBody: 'Preview links last 10 minutes. Open the preview again from the Appearance page.',
+    noAccessTitle: 'You can’t preview the website’s appearance',
+    noAccessBody: 'Ask a School Administrator if you need to see template previews.',
+  },
   /** Public templates. Buttons name what you get; no "Learn more", "Read more" or "Explore". */
   site: {
     mainNav: 'Main',
@@ -65,7 +78,6 @@ export const enGB = {
     menu: 'Menu',
     closeMenu: 'Close',
     submenu: '{label} pages',
-    home: 'Home page',
     apply: 'Apply',
     heroRegion: 'School highlights',
     slide: 'Slide {n} of {total}',

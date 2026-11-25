@@ -1,6 +1,6 @@
 import 'server-only';
 import { renderRichText } from '@/lib/rich-text/render';
-import type { ImageRef, SectionData } from '../../types';
+import type { Crumb, ImageRef, SectionData } from '../../types';
 import { publicObjectUrl } from '../loaders/media';
 import type { HomeSectionType } from '../section-settings';
 import { DEMO_MEDIA, type DemoMediaKey } from './media';
@@ -226,5 +226,93 @@ export function demoSectionData(): { [K in HomeSectionType]: SectionData[K] } {
       },
       cta: { label: 'Start an application', href: '/admissions/apply/s1-2027', external: false },
     },
+  };
+}
+
+const text = (value: string, marks?: { type: string; attrs?: Record<string, unknown> }[]) => ({
+  type: 'text',
+  text: value,
+  ...(marks ? { marks } : {}),
+});
+const para = (...content: ReturnType<typeof text>[]) => ({ type: 'paragraph', content });
+
+/** An inner page for the page-frame demo: the kind of content the Phase 4 editor produces. */
+export function demoInnerPage(): {
+  title: string;
+  breadcrumbs: Crumb[];
+  body: ReturnType<typeof renderRichText>;
+  sectionLinks: { label: string; href: string; current?: boolean }[];
+} {
+  return {
+    title: 'About the school',
+    breadcrumbs: [
+      { label: 'Home', href: '/' },
+      { label: 'About', href: '/about' },
+      { label: 'About the school' },
+    ],
+    sectionLinks: [
+      { label: 'About the school', href: '/about', current: true },
+      { label: 'History', href: '/about/history' },
+      { label: 'Leadership', href: '/about/leadership' },
+      { label: 'Admissions', href: '/admissions' },
+    ],
+    body: renderRichText({
+      type: 'doc',
+      content: [
+        para(
+          text(
+            'Demo School is a mixed day and boarding secondary school in Ntinda, Kampala. It opened in 1964 with 80 students and now teaches 1,150 from senior one to senior six.',
+          ),
+        ),
+        { type: 'heading', attrs: { level: 2 }, content: [text('What students study')] },
+        para(
+          text(
+            'Students follow the UNEB curriculum and sit their examinations at senior four and senior six. The ',
+          ),
+          text('academics page', [{ type: 'link', attrs: { href: '/academics' } }]),
+          text(' lists every subject and combination.'),
+        ),
+        {
+          type: 'bulletList',
+          content: [
+            {
+              type: 'listItem',
+              content: [para(text('Eighteen O-level subjects, eight of them compulsory'))],
+            },
+            {
+              type: 'listItem',
+              content: [
+                para(text('Twelve A-level combinations across sciences, arts and business')),
+              ],
+            },
+            {
+              type: 'listItem',
+              content: [para(text('General Paper for every senior five and six student'))],
+            },
+          ],
+        },
+        { type: 'heading', attrs: { level: 3 }, content: [text('Boarding')] },
+        para(
+          text(
+            'Boarders live in four houses, each with a resident house parent. Prep runs from 7 pm to 9 pm on weekdays, supervised by a teacher on duty.',
+          ),
+        ),
+        {
+          type: 'blockquote',
+          content: [
+            para(
+              text(
+                'Every student should leave able to think for themselves and look after others.',
+              ),
+            ),
+          ],
+        },
+        para(
+          text('Families are welcome to visit on any Saturday morning during term. '),
+          text('Book a visit', [{ type: 'link', attrs: { href: '/admissions/visits' } }]),
+          text(' and the admissions office will confirm a time.'),
+        ),
+      ],
+    }),
   };
 }

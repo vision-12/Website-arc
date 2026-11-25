@@ -1,19 +1,9 @@
-import { readFileSync } from 'node:fs';
-import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
 import { parseSection } from '@/features/templates/shared/section-settings';
+import { seededSettingsJson as seededSettings } from '../../../../../test/support/demo-settings';
 import { SiteSettings } from '../schema';
 
 /** The local demo school must always be valid, or the site silently falls back to neutral settings. */
-function seededSettings(): unknown {
-  const sql = readFileSync(join(process.cwd(), 'supabase/seed/demo-content.sql'), 'utf8');
-  const match = /update public\.site_settings set data = '([\s\S]*)'::jsonb where id = 1;/.exec(
-    sql,
-  );
-  if (!match?.[1]) throw new Error('demo settings update not found');
-  return JSON.parse(match[1].replaceAll("''", "'"));
-}
-
 describe('local demo seed', () => {
   it('parses with the site settings schema', () => {
     const result = SiteSettings.safeParse(seededSettings());

@@ -38,6 +38,8 @@ export default defineConfig({
         // Shell out to the Supabase CLI; exercised by the CI database job itself.
         'scripts/supabase-env.mjs',
         'scripts/check-advisors.mjs',
+        // Generates the committed demo photos and seed SQL (local only); demo-seed.test.ts checks the output.
+        'scripts/generate-demo-media.mjs',
         '**/__tests__/**',
       ],
       thresholds: { lines: 90, functions: 90, branches: 80, statements: 90 },

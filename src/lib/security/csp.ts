@@ -7,6 +7,8 @@ export interface CspOptions {
   supabaseUrl: string;
   /** Development needs 'unsafe-eval' for React's dev tooling and ws: for HMR. */
   isDev?: boolean;
+  /** 'self' only for the template preview, which the Appearance page embeds (spec §6.4). */
+  frameAncestors?: 'none' | 'self';
 }
 
 /** Third-party hosts the site may show images from (video thumbnails, static maps). */
@@ -25,7 +27,12 @@ export const FRAME_HOSTS = [
   'https://www.google.com',
 ] as const;
 
-export function buildCsp({ nonce, supabaseUrl, isDev = false }: CspOptions): string {
+export function buildCsp({
+  nonce,
+  supabaseUrl,
+  isDev = false,
+  frameAncestors = 'none',
+}: CspOptions): string {
   if (!/^[A-Za-z0-9+/=_-]{16,}$/.test(nonce)) throw new Error('CSP nonce is missing or malformed');
   const supabase = new URL(supabaseUrl).origin;
   const supabaseWs = supabase.replace(/^http/, 'ws');
@@ -50,7 +57,7 @@ export function buildCsp({ nonce, supabaseUrl, isDev = false }: CspOptions): str
     'worker-src': ["'self'", 'blob:'],
     'manifest-src': ["'self'"],
     'form-action': ["'self'"],
-    'frame-ancestors': ["'none'"],
+    'frame-ancestors': [frameAncestors === 'self' ? "'self'" : "'none'"],
     'base-uri': ["'none'"],
     'object-src': ["'none'"],
   };

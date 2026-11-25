@@ -5,6 +5,8 @@ import { refreshSession } from '@/lib/supabase/proxy';
 export const NONCE_HEADER = 'x-nonce';
 
 const isAdminPath = (pathname: string) => pathname === '/admin' || pathname.startsWith('/admin/');
+/** Template previews (spec §6.4): signed-in only, private, framed by this site only. */
+const isTemplatePreview = (pathname: string) => pathname.startsWith('/preview/template/');
 
 export async function proxy(request: NextRequest) {
   const { pathname, search } = request.nextUrl;
@@ -14,6 +16,7 @@ export async function proxy(request: NextRequest) {
     nonce,
     supabaseUrl: process.env.NEXT_PUBLIC_SUPABASE_URL || 'http://127.0.0.1:54321',
     isDev: process.env.NODE_ENV === 'development',
+    frameAncestors: isTemplatePreview(pathname) ? 'self' : 'none',
   });
 
   // Next.js reads the nonce from the request's CSP header and applies it to its own scripts.
@@ -27,7 +30,7 @@ export async function proxy(request: NextRequest) {
   );
 
   let result: NextResponse = response;
-  if (isAdminPath(pathname) && !claims) {
+  if ((isAdminPath(pathname) || isTemplatePreview(pathname)) && !claims) {
     // Not signed in: send to the login page, remembering where they were going.
     const login = new URL('/login', request.url);
     login.searchParams.set('next', pathname + search);
@@ -36,7 +39,12 @@ export async function proxy(request: NextRequest) {
   }
 
   result.headers.set('Content-Security-Policy', csp);
-  if (isAdminPath(pathname) || pathname.startsWith('/login') || pathname.startsWith('/auth/')) {
+  if (
+    isAdminPath(pathname) ||
+    isTemplatePreview(pathname) ||
+    pathname.startsWith('/login') ||
+    pathname.startsWith('/auth/')
+  ) {
     result.headers.set('Cache-Control', 'private, no-store');
     result.headers.set('X-Robots-Tag', 'noindex, nofollow');
   }

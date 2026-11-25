@@ -1,10 +1,10 @@
 import { Suspense } from 'react';
 import type { Metadata, Viewport } from 'next';
 import { connection } from 'next/server';
-import { StyleNonce } from '@/components/shared/style-nonce';
 import { getSiteSettings } from '@/features/cms/settings/queries';
 import { fontVariableClassNames } from '@/lib/fonts/fonts';
 import { publicEnv } from '@/lib/env/public';
+import '@/lib/fonts/fallbacks.css';
 import './globals.css';
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -44,7 +44,6 @@ export default async function RootLayout({ children }: { children: React.ReactNo
         <link rel="stylesheet" href={`/theme.css?v=${version}`} precedence="theme" />
       </head>
       <body>
-        <StyleNonce />
         {children}
         <Suspense fallback={null}>
           <RequestBoundary />

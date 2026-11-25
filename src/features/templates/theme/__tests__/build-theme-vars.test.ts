@@ -36,8 +36,12 @@ describe('buildThemeVars', () => {
   });
 
   it('maps fonts, radius and density', () => {
-    expect(vars['--brand-font-heading']).toBe('var(--font-playfair-display)');
-    expect(vars['--brand-font-body']).toBe('var(--font-nunito-sans)');
+    expect(vars['--brand-font-heading']).toBe(
+      "var(--font-playfair-display), 'Playfair Display Fallback Android', 'Playfair Display Fallback Linux', serif",
+    );
+    expect(vars['--brand-font-body']).toBe(
+      "var(--font-nunito-sans), 'Nunito Sans Fallback Android', 'Nunito Sans Fallback Linux', sans-serif",
+    );
     expect(vars['--brand-radius']).toBe('1rem');
     expect(vars['--brand-density']).toBe('0.85');
   });

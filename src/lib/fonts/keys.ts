@@ -24,3 +24,22 @@ export const FONT_LABELS: Record<FontKey, string> = {
 
 /** CSS custom property each family is exposed as (set by next/font `variable`). */
 export const fontVar = (key: FontKey) => `--font-${key}`;
+
+const GENERIC: Record<FontKey, 'sans-serif' | 'serif'> = {
+  inter: 'sans-serif',
+  'source-serif-4': 'serif',
+  'playfair-display': 'serif',
+  lora: 'serif',
+  'nunito-sans': 'sans-serif',
+  merriweather: 'serif',
+  'dm-sans': 'sans-serif',
+  'libre-baskerville': 'serif',
+};
+
+/**
+ * The full stack for a family: the web font and next/font's Arial/Times-matched fallback (the
+ * variable), then the faces from src/lib/fonts/fallbacks.css matched to Android's and Linux's own
+ * fonts, so text keeps its size and line breaks while the web font arrives.
+ */
+export const fontStack = (key: FontKey) =>
+  `var(${fontVar(key)}), '${FONT_LABELS[key]} Fallback Android', '${FONT_LABELS[key]} Fallback Linux', ${GENERIC[key]}`;

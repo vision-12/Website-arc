@@ -1,7 +1,7 @@
 import { contrastRatio, NEAR_BLACK, WHITE } from '@/lib/colour/contrast';
 import { colourScale } from '@/lib/colour/oklch';
 import { suggestAccessibleColour } from '@/lib/colour/suggest';
-import { fontVar } from '@/lib/fonts/keys';
+import { fontStack } from '@/lib/fonts/keys';
 import type { Theme } from '@/features/cms/settings/schema';
 
 export type ThemeVars = Record<`--brand-${string}`, string>;
@@ -41,8 +41,8 @@ export function buildThemeVars(theme: Theme): ThemeVars {
     ...colourVars('accent', theme.accent ?? theme.secondary),
     '--brand-radius': RADIUS[theme.radius],
     '--brand-density': DENSITY[theme.density],
-    '--brand-font-heading': `var(${fontVar(theme.fontHeading)})`,
-    '--brand-font-body': `var(${fontVar(theme.fontBody)})`,
+    '--brand-font-heading': fontStack(theme.fontHeading),
+    '--brand-font-body': fontStack(theme.fontBody),
   };
 }
 

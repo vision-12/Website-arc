@@ -11,6 +11,24 @@ const ADMIN_CLIENT_ALLOWED = [
   'src/lib/supabase/admin.ts',
 ];
 
+const ADMIN_CLIENT_MESSAGE =
+  'The secret-key client is only allowed in app/api/cron, app/api/webhooks and scripts (CLAUDE.md).';
+const ADMIN_CLIENT_PATHS = [{ name: '@/lib/supabase/admin', message: ADMIN_CLIENT_MESSAGE }];
+const ADMIN_CLIENT_PATTERNS = [
+  { group: ['**/lib/supabase/admin', '**/lib/supabase/admin.ts'], message: ADMIN_CLIENT_MESSAGE },
+  { group: ['@supabase/auth-helpers-*'], message: 'Use @supabase/ssr (MP §2.4).' },
+];
+
+// Templates are presentation only (CLAUDE.md, plan §4.2): only the cached loaders and the section
+// registry under src/features/templates may reach the database.
+const TEMPLATE_DB_MESSAGE =
+  'Templates never query the database. Load data in src/features/templates/shared/loaders and pass it as props.';
+const TEMPLATE_DB_ALLOWED = [
+  'src/features/templates/shared/loaders/**',
+  'src/features/templates/shared/sections.ts',
+  'src/features/templates/**/__tests__/**',
+];
+
 export default defineConfig([
   ...nextVitals,
   ...nextTs,
@@ -55,21 +73,29 @@ export default defineConfig([
     rules: {
       'no-restricted-imports': [
         'error',
+        { paths: ADMIN_CLIENT_PATHS, patterns: ADMIN_CLIENT_PATTERNS },
+      ],
+    },
+  },
+
+  // Templates never query the database. The same rule key replaces the block above for these
+  // files, so the secret-key restriction is repeated here.
+  {
+    files: ['src/features/templates/**/*.{ts,tsx}'],
+    ignores: TEMPLATE_DB_ALLOWED,
+    rules: {
+      'no-restricted-imports': [
+        'error',
         {
           paths: [
-            {
-              name: '@/lib/supabase/admin',
-              message:
-                'The secret-key client is only allowed in app/api/cron, app/api/webhooks and scripts (CLAUDE.md).',
-            },
+            ...ADMIN_CLIENT_PATHS,
+            { name: '@supabase/supabase-js', message: TEMPLATE_DB_MESSAGE },
+            { name: '@supabase/ssr', message: TEMPLATE_DB_MESSAGE },
           ],
           patterns: [
-            {
-              group: ['**/lib/supabase/admin', '**/lib/supabase/admin.ts'],
-              message:
-                'The secret-key client is only allowed in app/api/cron, app/api/webhooks and scripts (CLAUDE.md).',
-            },
-            { group: ['@supabase/auth-helpers-*'], message: 'Use @supabase/ssr (MP §2.4).' },
+            ...ADMIN_CLIENT_PATTERNS,
+            { group: ['@/lib/supabase/*', '**/lib/supabase/*'], message: TEMPLATE_DB_MESSAGE },
+            { group: ['@/features/**/queries', '**/queries'], message: TEMPLATE_DB_MESSAGE },
           ],
         },
       ],

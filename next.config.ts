@@ -46,7 +46,15 @@ const config: NextConfig = {
     ],
   },
   headers() {
-    return Promise.resolve([{ source: '/:path*', headers: securityHeaders }]);
+    return Promise.resolve([
+      { source: '/:path*', headers: securityHeaders },
+      // The template preview is embedded by the Appearance page (spec §6.4). For the same header
+      // key, the later rule wins; the CSP's frame-ancestors 'self' is set in proxy.ts.
+      {
+        source: '/preview/template/:path*',
+        headers: [{ key: 'X-Frame-Options', value: 'SAMEORIGIN' }],
+      },
+    ]);
   },
 };
 

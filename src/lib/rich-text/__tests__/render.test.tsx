@@ -13,6 +13,25 @@ const text = (value: string, marks?: unknown[]) => ({
 const link = (href: string) => ({ type: 'link', attrs: { href } });
 
 describe('renderRichText', () => {
+  it('drops nodes and marks outside the editor schema instead of failing the page', () => {
+    const out = html({
+      type: 'doc',
+      content: [
+        para(text('kept '), text('plain', [{ type: 'highlight' }])),
+        { type: 'iframe', attrs: { src: 'https://evil.example' } },
+      ],
+    });
+    expect(out).toContain('kept plain');
+    expect(out).not.toContain('iframe');
+    expect(out).not.toContain('evil');
+  });
+
+  it('returns nothing for a document the renderer cannot read', () => {
+    expect(
+      renderRichText({ type: 'doc', content: [{ type: 'paragraph', content: 'x' }] }),
+    ).toBeNull();
+  });
+
   it('renders paragraphs, headings, lists and emphasis as plain semantic HTML', () => {
     const out = html({
       type: 'doc',

@@ -1,9 +1,46 @@
 'use client';
 import { Children, useEffect, useState, type CSSProperties, type ReactNode } from 'react';
-import { ChevronLeft, ChevronRight, Pause, Play } from 'lucide-react';
 import { useHydrated } from '@/hooks/use-hydrated';
 import { fill } from '@/lib/i18n/format';
-import { cn } from '@/lib/utils';
+
+/**
+ * Public islands stay small (MP §10: 120 KB of JavaScript on public pages, most of it the
+ * framework), so this file joins classes by hand and draws its four icons inline instead of
+ * pulling in tailwind-merge and the icon runtime. Icon paths: Lucide (ISC licence).
+ */
+const cx = (...parts: (string | false | null | undefined)[]) => parts.filter(Boolean).join(' ');
+
+function Icon({
+  name,
+  className,
+}: {
+  name: 'pause' | 'play' | 'left' | 'right';
+  className: string;
+}) {
+  return (
+    <svg
+      aria-hidden="true"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      className={className}
+    >
+      {name === 'pause' ? (
+        <>
+          <rect x="14" y="4" width="4" height="16" rx="1" />
+          <rect x="6" y="4" width="4" height="16" rx="1" />
+        </>
+      ) : name === 'play' ? (
+        <path d="M5 5a2 2 0 0 1 3.008-1.728l11.997 6.998a2 2 0 0 1 .003 3.458l-12 7A2 2 0 0 1 5 19z" />
+      ) : (
+        <path d={name === 'left' ? 'm15 18-6-6 6-6' : 'm9 18 6-6-6-6'} />
+      )}
+    </svg>
+  );
+}
 
 export interface HeroCarouselLabels {
   region: string;
@@ -84,7 +121,7 @@ export function HeroCarousel({
   };
 
   const onImage = tone === 'onImage';
-  const control = cn(
+  const control = cx(
     'tpl-btn inline-flex size-10 items-center justify-center rounded-full',
     onImage ? 'hover:bg-white/15' : 'hover:bg-tpl-surface-alt',
   );
@@ -98,7 +135,7 @@ export function HeroCarousel({
       role="region"
       aria-roledescription="carousel"
       aria-label={labels.region}
-      className={cn('relative', className)}
+      className={cx('relative', className)}
       onPointerEnter={() => setHeld(true)}
       onPointerLeave={() => setHeld(false)}
       onFocus={() => setHeld(true)}
@@ -116,7 +153,7 @@ export function HeroCarousel({
             aria-hidden={i !== index}
             inert={i !== index}
             hidden={!primed.has(i) && i !== index}
-            className={cn(
+            className={cx(
               'transition-opacity duration-[600ms] ease-[var(--tpl-ease)] motion-reduce:duration-150 starting:opacity-0',
               // Every slide shares one grid cell: the carousel is as tall as its tallest slide.
               'col-start-1 row-start-1',
@@ -129,9 +166,9 @@ export function HeroCarousel({
       </div>
 
       {hydrated && total > 1 ? (
-        <div className={cn('pointer-events-none flex', controlsClassName)}>
+        <div className={cx('pointer-events-none flex', controlsClassName)}>
           <div
-            className={cn(
+            className={cx(
               'pointer-events-auto inline-flex items-center gap-0.5 rounded-full p-1',
               onImage
                 ? 'tpl-glass tpl-glass-dark'
@@ -146,9 +183,9 @@ export function HeroCarousel({
                 aria-label={playing ? labels.pause : labels.play}
               >
                 {playing ? (
-                  <Pause aria-hidden="true" className="size-4" />
+                  <Icon name="pause" className="size-4" />
                 ) : (
-                  <Play aria-hidden="true" className="size-4" />
+                  <Icon name="play" className="size-4" />
                 )}
               </button>
             ) : null}
@@ -158,7 +195,7 @@ export function HeroCarousel({
               onClick={() => go(index - 1)}
               aria-label={labels.previous}
             >
-              <ChevronLeft aria-hidden="true" className="size-5" />
+              <Icon name="left" className="size-5" />
             </button>
             <div className="flex items-center px-1">
               {slides.map((_, i) => (
@@ -171,7 +208,7 @@ export function HeroCarousel({
                   className="group inline-flex h-10 w-6 items-center justify-center"
                 >
                   <span
-                    className={cn(
+                    className={cx(
                       // Never animate width (layout): the dot stretches with a transform.
                       'relative block h-1.5 w-5 overflow-hidden rounded-full transition-[transform,background-color] duration-200',
                       i === index ? 'scale-x-100' : 'scale-x-[0.3]',
@@ -194,7 +231,7 @@ export function HeroCarousel({
                         aria-hidden="true"
                         style={fillStyle}
                         onAnimationEnd={() => go(index + 1)}
-                        className={cn(
+                        className={cx(
                           'absolute inset-0 origin-left animate-[tpl-fill_var(--tpl-dur)_linear_forwards] rounded-full',
                           onImage ? 'bg-white' : 'bg-tpl-ink',
                         )}
@@ -210,7 +247,7 @@ export function HeroCarousel({
               onClick={() => go(index + 1)}
               aria-label={labels.next}
             >
-              <ChevronRight aria-hidden="true" className="size-5" />
+              <Icon name="right" className="size-5" />
             </button>
           </div>
         </div>
