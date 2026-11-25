@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { z } from 'zod';
 import { ForbiddenError, MfaRequiredError, UnauthenticatedError } from '@/lib/auth/errors';
-import { MESSAGES, toActionError } from '../errors';
+import { ActionFailure, MESSAGES, toActionError } from '../errors';
 
 describe('toActionError — nothing raw reaches the browser', () => {
   it('maps validation errors to field errors', () => {
@@ -35,5 +35,42 @@ describe('toActionError — nothing raw reaches the browser', () => {
     expect(e.code).toBe(code);
     expect(e.message).toBe(MESSAGES[code]);
     expect(e.message).not.toMatch(/row-level|ECONNREFUSED|password|PGRST|SQLSTATE/);
+  });
+});
+
+describe('toActionError — specific, authored messages', () => {
+  it('uses the plain-language DETAIL of our own VALIDATION raises', () => {
+    const e = toActionError({
+      code: '22023',
+      message: 'VALIDATION',
+      details: 'This page has sub-pages. Move them, or move them to Trash, first.',
+    });
+    expect(e).toEqual({
+      code: 'VALIDATION',
+      message: 'This page has sub-pages. Move them, or move them to Trash, first.',
+    });
+  });
+
+  it('falls back to the generic message when there is no usable detail', () => {
+    expect(toActionError({ code: '22023', message: 'VALIDATION' }).message).toBe(
+      MESSAGES.VALIDATION,
+    );
+    expect(
+      toActionError({ code: '22023', message: 'VALIDATION', details: 'x'.repeat(500) }).message,
+    ).toBe(MESSAGES.VALIDATION);
+  });
+
+  it('passes ActionFailure through with its own message and field errors', () => {
+    const e = toActionError(
+      new ActionFailure('VALIDATION', 'Another page already uses this address.', {
+        slug: ['Another page already uses this address.'],
+      }),
+    );
+    expect(e).toEqual({
+      code: 'VALIDATION',
+      message: 'Another page already uses this address.',
+      fieldErrors: { slug: ['Another page already uses this address.'] },
+    });
+    expect(toActionError(new ActionFailure('CONFLICT')).message).toBe(MESSAGES.CONFLICT);
   });
 });

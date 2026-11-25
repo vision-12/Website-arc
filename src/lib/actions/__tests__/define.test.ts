@@ -66,3 +66,18 @@ describe('defineUserAction', () => {
     expect(requirePermission).not.toHaveBeenCalled();
   });
 });
+
+describe('defineAction with a permission that depends on the input', () => {
+  it('resolves the permission before checking it', async () => {
+    requirePermission.mockResolvedValue(access);
+    const action = defineAction({
+      input: z.object({ approval: z.boolean() }),
+      permission: ({ approval }) => Promise.resolve(approval ? 'pages.approve' : 'pages.publish'),
+      handler: () => Promise.resolve('done'),
+    });
+    await action({ approval: true });
+    expect(requirePermission).toHaveBeenLastCalledWith('pages.approve');
+    await action({ approval: false });
+    expect(requirePermission).toHaveBeenLastCalledWith('pages.publish');
+  });
+});

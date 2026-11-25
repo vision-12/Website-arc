@@ -41,7 +41,29 @@ const DB_MESSAGE_CODES: ReadonlySet<string> = new Set([
 interface PgLikeError {
   code?: string;
   message?: string;
+  details?: string | null;
 }
+
+/**
+ * Thrown by action handlers to fail with a specific code, optionally with a plain-language message
+ * written for that case (never a raw error text).
+ */
+export class ActionFailure extends Error {
+  constructor(
+    readonly code: ErrorCode,
+    readonly userMessage?: string,
+    readonly fieldErrors?: Record<string, string[]>,
+  ) {
+    super(code);
+    this.name = 'ActionFailure';
+  }
+}
+
+/** Our own database raises put a plain-language explanation in DETAIL (e.g. "Pages can be nested…"). */
+const authoredDetail = (e: PgLikeError): string | null =>
+  typeof e.details === 'string' && e.details.length > 0 && e.details.length <= 240
+    ? e.details
+    : null;
 
 const isPgLike = (e: unknown): e is PgLikeError =>
   typeof e === 'object' &&
@@ -66,7 +88,18 @@ export function toActionError(error: unknown): ActionError {
   if (error instanceof UnauthenticatedError) return from('UNAUTHENTICATED');
   if (error instanceof ForbiddenError) return from('FORBIDDEN');
   if (error instanceof MfaRequiredError) return from('MFA_REQUIRED');
+  if (error instanceof ActionFailure) {
+    return {
+      code: error.code,
+      message: error.userMessage ?? MESSAGES[error.code],
+      ...(error.fieldErrors ? { fieldErrors: error.fieldErrors } : {}),
+    };
+  }
   if (isPgLike(error)) {
+    if (error.message === 'VALIDATION') {
+      const detail = authoredDetail(error);
+      return detail ? { code: 'VALIDATION', message: detail } : from('VALIDATION');
+    }
     if (error.message && DB_MESSAGE_CODES.has(error.message))
       return from(error.message as ErrorCode);
     switch (error.code) {

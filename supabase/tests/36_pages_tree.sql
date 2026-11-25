@@ -38,7 +38,7 @@ select is((select status::text from public.pages where id = '36000000-0000-4000-
 select throws_ok($$insert into public.pages (title, slug, system_key) values ('Sneaky', 'sneaky-36', 'privacy')$$,
   '42501', 'FORBIDDEN', 'people cannot create built-in pages');
 
-select lives_ok($$select public.reorder_pages(null, array['36000000-0000-4000-8000-000000000003',
+select lives_ok($$select public.reorder_pages(array['36000000-0000-4000-8000-000000000003',
   '36000000-0000-4000-8000-000000000001']::uuid[])$$, 'the content editor reorders top-level pages');
 select ok((select nav_order from public.pages where id = '36000000-0000-4000-8000-000000000003')
   < (select nav_order from public.pages where id = '36000000-0000-4000-8000-000000000001'), '... and the order changed');

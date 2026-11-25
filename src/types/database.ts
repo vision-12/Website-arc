@@ -1698,7 +1698,7 @@ export type Database = {
       };
       rate_limit_check_auth: { Args: { p_payload: string; p_ticket: Json }; Returns: boolean };
       record_login: { Args: Record<PropertyKey, never>; Returns: undefined };
-      reorder_pages: { Args: { p_ids: string[]; p_parent: string }; Returns: undefined };
+      reorder_pages: { Args: { p_ids: string[]; p_parent?: string }; Returns: undefined };
       revoke_user_sessions: { Args: { p_user: string }; Returns: number };
       save_working_copy: {
         Args: { p_base_version: number; p_data: Json; p_entity_id: string; p_entity_type: string };

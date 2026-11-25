@@ -179,7 +179,7 @@ create trigger pages_05_structure before insert or update on public.pages
 
 -- Menu order among siblings, in one statement and as the caller (RLS and the lifecycle trigger apply:
 -- reordering live pages is a publish action, spec §2.3).
-create or replace function public.reorder_pages(p_parent uuid, p_ids uuid[])
+create or replace function public.reorder_pages(p_ids uuid[], p_parent uuid default null)
 returns void language plpgsql security invoker set search_path = '' as $$
 begin
   if cardinality(p_ids) > 500 or exists (
@@ -193,8 +193,8 @@ begin
     from unnest(p_ids) with ordinality as o (id, ord)
    where p.id = o.id and p.nav_order is distinct from (o.ord * 10)::integer;
 end $$;
-revoke all on function public.reorder_pages(uuid, uuid[]) from public, anon;
-grant execute on function public.reorder_pages(uuid, uuid[]) to authenticated;
+revoke all on function public.reorder_pages(uuid[], uuid) from public, anon;
+grant execute on function public.reorder_pages(uuid[], uuid) to authenticated;
 
 -- ── Media: checked uploads (P4-G, ADR-018) ────────────────────────────────────────────────────────
 alter table public.media_assets add column confirmed_at timestamptz;

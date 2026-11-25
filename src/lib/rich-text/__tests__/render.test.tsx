@@ -57,7 +57,7 @@ describe('renderRichText', () => {
     });
     expect(out).toContain('<a href="/about">our page</a>');
     expect(out).toContain(
-      '<a href="https://example.org/education" rel="noopener noreferrer">the ministry</a>',
+      '<a href="https://example.org/education" rel="noopener noreferrer nofollow">the ministry</a>',
     );
     expect(out).not.toContain('javascript:');
     expect(out).toContain('click me');
@@ -78,6 +78,59 @@ describe('renderRichText', () => {
     });
     expect(out).not.toContain('rm -rf');
     expect(out).toContain('still here');
+  });
+});
+
+describe('renderRichText with library media (plan P4-F)', () => {
+  const photo = '22222222-2222-4222-8222-222222222222';
+  const pdf = '11111111-1111-4111-8111-111111111111';
+  const media = {
+    images: {
+      [photo]: {
+        src: 'https://storage.example/media/a.webp',
+        width: 1200,
+        height: 800,
+        alt: 'Pupils reading in the library',
+        caption: 'The new library, opened in 2025',
+      },
+    },
+    documents: { [pdf]: { url: 'https://storage.example/media/fees.pdf', sizeBytes: 245_760 } },
+  };
+  const doc = {
+    type: 'doc',
+    content: [
+      { type: 'image', attrs: { mediaId: photo, size: 'wide' } },
+      para(text('Fees letter', [{ type: 'link', attrs: { href: '/old.pdf', mediaId: pdf } }])),
+      { type: 'image', attrs: { mediaId: '33333333-3333-4333-8333-333333333333' } },
+      para(
+        text('Old letter', [
+          { type: 'link', attrs: { mediaId: '44444444-4444-4444-8444-444444444444' } },
+        ]),
+      ),
+    ],
+  };
+
+  it('draws photos with the library description and caption', () => {
+    // Without the library lookup the photo is simply left out.
+    expect(html({ type: 'doc', content: [doc.content[0]] })).toBe('');
+    const withMedia = renderToStaticMarkup(<>{renderRichText(doc, media)}</>);
+    expect(withMedia).toContain('alt="Pupils reading in the library"');
+    expect(withMedia).toContain('<figcaption>The new library, opened in 2025</figcaption>');
+    expect(withMedia).toContain('rt-figure-wide');
+  });
+
+  it('links PDFs to their current file and says what they are', () => {
+    const out = renderToStaticMarkup(<>{renderRichText(doc, media)}</>);
+    expect(out).toContain('href="https://storage.example/media/fees.pdf"');
+    expect(out).toContain('(PDF, 240 KB)');
+    expect(out).not.toContain('/old.pdf');
+  });
+
+  it('leaves out photos and files that are missing, keeping the link text', () => {
+    const out = renderToStaticMarkup(<>{renderRichText(doc, media)}</>);
+    expect(out.match(/<img/g)).toHaveLength(1);
+    expect(out).toContain('Old letter');
+    expect(out).not.toContain('44444444');
   });
 });
 
