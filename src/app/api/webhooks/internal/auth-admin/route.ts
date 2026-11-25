@@ -1,9 +1,8 @@
-import { timingSafeEqual } from 'node:crypto';
 import { NextResponse, type NextRequest } from 'next/server';
 import { z } from 'zod';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { publicEnv } from '@/lib/env/public';
-import { serverEnv } from '@/lib/env/server';
+import { hasCronSecret } from '@/lib/security/cron-auth';
 
 /**
  * Privileged auth operations (spec D13, ADR-007). NOT called by browsers: a Server Action first
@@ -20,16 +19,8 @@ const InvitePayload = z.object({
   role_ids: z.array(z.uuid()).min(1).max(10),
 });
 
-function authorised(request: NextRequest): boolean {
-  const header = request.headers.get('authorization') ?? '';
-  const expected = `Bearer ${serverEnv().CRON_SECRET}`;
-  const a = Buffer.from(header);
-  const b = Buffer.from(expected);
-  return a.length === b.length && timingSafeEqual(a, b);
-}
-
 export async function POST(request: NextRequest) {
-  if (!authorised(request)) return NextResponse.json({ error: 'unauthorised' }, { status: 401 });
+  if (!hasCronSecret(request)) return NextResponse.json({ error: 'unauthorised' }, { status: 401 });
   const parsed = Body.safeParse(await request.json().catch(() => null));
   if (!parsed.success) return NextResponse.json({ error: 'bad_request' }, { status: 400 });
 

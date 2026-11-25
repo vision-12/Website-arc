@@ -17,6 +17,7 @@ export async function proxy(request: NextRequest) {
     supabaseUrl: process.env.NEXT_PUBLIC_SUPABASE_URL || 'http://127.0.0.1:54321',
     isDev: process.env.NODE_ENV === 'development',
     frameAncestors: isTemplatePreview(pathname) ? 'self' : 'none',
+    allowWasm: isAdminPath(pathname),
   });
 
   // Next.js reads the nonce from the request's CSP header and applies it to its own scripts.
@@ -47,6 +48,11 @@ export async function proxy(request: NextRequest) {
   ) {
     result.headers.set('Cache-Control', 'private, no-store');
     result.headers.set('X-Robots-Tag', 'noindex, nofollow');
+  }
+  // Draft preview (MP §5): never indexed, never cached by a shared cache.
+  if (request.cookies.has('__prerender_bypass')) {
+    result.headers.set('X-Robots-Tag', 'noindex, nofollow');
+    result.headers.set('Cache-Control', 'private, no-store');
   }
   return result;
 }

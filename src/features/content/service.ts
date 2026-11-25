@@ -192,6 +192,27 @@ export function contentService<V, Row extends ContentRowBase, Patch>(
     if (error) throw error;
   }
 
+  /**
+   * A status-only change (hide, cancel schedule, send back, Trash) doesn't touch the content, so the
+   * person's own working copy is still based on the same text: move it to the new version so it
+   * isn't mistaken for a copy made before someone else's edit.
+   */
+  async function rebaseCopy(
+    supabase: TypedClient,
+    access: Access,
+    id: string,
+    from: number,
+    to: number,
+  ) {
+    await supabase
+      .from('content_drafts')
+      .update({ base_version: to })
+      .eq('entity_type', entity)
+      .eq('entity_id', id)
+      .eq('updated_by', access.userId)
+      .eq('base_version', from);
+  }
+
   /** Read-your-writes for the acting editor; visitors get fresh pages on their next request. */
   function expireTags(before: Row | null, after: Row | null) {
     const tags = new Set<string>();
@@ -291,19 +312,36 @@ export function contentService<V, Row extends ContentRowBase, Patch>(
     },
 
     /** Autosave to the person's working copy (D4); never touches the live item. */
-    async autosave(input: {
-      id: string;
-      baseVersion: number;
-      data: DraftOf<V>;
-    }): Promise<AutosaveResult> {
+    async autosave(
+      input: { id: string; baseVersion: number; data: DraftOf<V>; force?: boolean | undefined },
+      access: Access,
+    ): Promise<AutosaveResult> {
       const supabase = await createClient();
+      const now = new Date().toISOString();
+      // `force` (the Preview button) skips the 5-second throttle so the preview shows what was just typed.
+      const save = input.force
+        ? supabase
+            .from('content_drafts')
+            .upsert(
+              {
+                entity_type: entity,
+                entity_id: input.id,
+                updated_by: access.userId,
+                data: asJson(input.data),
+                base_version: input.baseVersion,
+                updated_at: now,
+              },
+              { onConflict: 'entity_type,entity_id,updated_by' },
+            )
+            .then(({ error }) => ({ data: now, error }))
+        : supabase.rpc('save_working_copy', {
+            p_entity_type: entity,
+            p_entity_id: input.id,
+            p_base_version: input.baseVersion,
+            p_data: asJson(input.data),
+          });
       const [saved, row, editors] = await Promise.all([
-        supabase.rpc('save_working_copy', {
-          p_entity_type: entity,
-          p_entity_id: input.id,
-          p_base_version: input.baseVersion,
-          p_data: asJson(input.data),
-        }),
+        save,
         m.table.get(supabase, input.id),
         otherEditors(supabase, input.id),
       ]);
@@ -357,6 +395,7 @@ export function contentService<V, Row extends ContentRowBase, Patch>(
     /** A status change without content changes (hide, cancel schedule, send back). */
     async changeStatus(
       input: { id: string; version: number },
+      access: Access,
       decide: (before: Row) => Transition & { status: ContentStatus },
     ): Promise<WriteResult> {
       const supabase = await createClient();
@@ -368,12 +407,13 @@ export function contentService<V, Row extends ContentRowBase, Patch>(
         status: t.status,
         ...(t.publishAt !== undefined ? { publish_at: t.publishAt } : {}),
       } as Patch & LifecyclePatch);
+      await rebaseCopy(supabase, access, input.id, before.version, after.version);
       await audit(supabase, t.action, before, after, t.metadata);
       expireTags(before, after);
       return result(after);
     },
 
-    async trash(input: { id: string; version: number }): Promise<WriteResult> {
+    async trash(input: { id: string; version: number }, access: Access): Promise<WriteResult> {
       const supabase = await createClient();
       const before = await m.table.get(supabase, input.id);
       if (!before || before.deleted_at) throw new ActionFailure('NOT_FOUND');
@@ -381,6 +421,7 @@ export function contentService<V, Row extends ContentRowBase, Patch>(
       const after = await writeOrConflict(supabase, input.id, input.version, {
         deleted_at: new Date().toISOString(),
       } as Patch & LifecyclePatch);
+      await rebaseCopy(supabase, access, input.id, before.version, after.version);
       await audit(supabase, 'trash', before, after);
       expireTags(before, after);
       return result(after);

@@ -63,7 +63,7 @@ export const createPage = defineAction({
 export const autosavePage = defineAction({
   input: AutosavePageInput,
   permission: 'pages.edit',
-  handler: (input) => pagesContent.autosave(input),
+  handler: (input, { access }) => pagesContent.autosave(input, access),
 });
 
 /** "Save draft" (or "Save changes" on a scheduled page): applies the changes, status unchanged. */
@@ -127,8 +127,8 @@ export const submitPageForReview = defineAction({
 export const sendPageBack = defineAction({
   input: SendPageBackInput,
   permission: 'pages.approve',
-  handler: ({ note, ...input }) =>
-    pagesContent.changeStatus(input, () => ({
+  handler: ({ note, ...input }, { access }) =>
+    pagesContent.changeStatus(input, access, () => ({
       action: 'sendBack',
       status: 'draft',
       metadata: { note },
@@ -139,8 +139,8 @@ export const sendPageBack = defineAction({
 export const unpublishPage = defineAction({
   input: VersionedRef,
   permission: () => pagePublishPermission(),
-  handler: (input) =>
-    pagesContent.changeStatus(input, (before) => ({
+  handler: (input, { access }) =>
+    pagesContent.changeStatus(input, access, (before) => ({
       action: before.status === 'scheduled' ? 'cancelSchedule' : 'unpublish',
       status: 'draft',
     })),
@@ -149,7 +149,7 @@ export const unpublishPage = defineAction({
 export const trashPage = defineAction({
   input: VersionedRef,
   permission: 'pages.delete',
-  handler: (input) => pagesContent.trash(input),
+  handler: (input, { access }) => pagesContent.trash(input, access),
 });
 
 export const restorePage = defineAction({

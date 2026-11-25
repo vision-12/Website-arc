@@ -115,3 +115,11 @@ function formatTimeShort(date: Date, timeZone: string): string {
     .replace(/\s/g, '')
     .toLowerCase();
 }
+
+/**
+ * The current time for request-time server code (admin pages are dynamic): passed to client
+ * components so their first render stays pure and matches the server.
+ */
+export function requestTime(): number {
+  return Date.now();
+}

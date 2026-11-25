@@ -96,6 +96,8 @@ export const AutosavePageInput = z.object({
   id: z.uuid(),
   baseVersion: Version,
   data: PageDraftValues,
+  /** Preview: save now, even within 5 seconds of the last save. */
+  force: z.boolean().optional(),
 });
 
 export const SavePageInput = z.object({ id: z.uuid(), version: Version, values: PageValues });

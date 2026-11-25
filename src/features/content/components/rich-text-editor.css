@@ -1,0 +1,65 @@
+/*
+ * Editor typography for the admin (the public site's .tpl-prose lives in the template CSS, which the
+ * admin does not load). Kept close to the public look so editors see roughly what visitors see.
+ */
+.rte-content {
+  line-height: 1.7;
+  font-size: 1rem;
+}
+.rte-content > * + * {
+  margin-top: 1em;
+}
+.rte-content :where(h2, h3, h4) {
+  margin-top: 1.6em;
+  line-height: 1.25;
+  font-weight: 600;
+}
+.rte-content h2 {
+  font-size: 1.5rem;
+}
+.rte-content h3 {
+  font-size: 1.25rem;
+}
+.rte-content h4 {
+  font-size: 1.1rem;
+}
+.rte-content :where(ul, ol) {
+  padding-left: 1.25rem;
+}
+.rte-content ul {
+  list-style: disc;
+}
+.rte-content ol {
+  list-style: decimal;
+}
+.rte-content li + li {
+  margin-top: 0.35em;
+}
+.rte-content a {
+  text-decoration: underline;
+  text-underline-offset: 0.2em;
+}
+.rte-content blockquote {
+  border-left: 3px solid var(--border);
+  padding-left: 1rem;
+  color: var(--muted-foreground);
+}
+.rte-content hr {
+  border: 0;
+  border-top: 1px solid var(--border);
+  margin-block: 2em;
+}
+.rte-content.ProseMirror-focused {
+  outline: none;
+}
+/* "Start writing…" until the first character (Tiptap Placeholder). */
+.rte-content p.is-editor-empty:first-child::before {
+  content: attr(data-placeholder);
+  float: left;
+  height: 0;
+  pointer-events: none;
+  color: var(--muted-foreground);
+}
+.rte-content .ProseMirror-selectednode {
+  outline: 3px solid var(--ring);
+}

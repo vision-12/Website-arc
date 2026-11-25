@@ -446,6 +446,32 @@
     border-left: 2px solid var(--tpl-brand);
     padding-left: 1rem;
   }
+  .tpl-prose h4 {
+    font-size: 1.1rem;
+  }
+  .tpl-prose hr {
+    border: 0;
+    border-top: 1px solid var(--tpl-rule);
+    margin-block: 2em;
+  }
+  /* Library photos and PDF links in page text (Phase 4, plan P4-F). */
+  .tpl-prose .rt-figure {
+    margin-block: 1.75em;
+  }
+  .tpl-prose .rt-figure img {
+    width: 100%;
+    height: auto;
+    border-radius: var(--tpl-radius);
+  }
+  .tpl-prose .rt-figure figcaption {
+    margin-top: 0.5em;
+    font-size: 0.875rem;
+    color: var(--tpl-ink-muted);
+  }
+  .tpl-prose .rt-file {
+    font-size: 0.875em;
+    white-space: nowrap;
+  }
 
   /* The phone menu is full screen; the page behind it stays put (no script needed). */
   html:has(details[data-tpl-menu='mobile'][open]) {
