@@ -71,7 +71,7 @@ Next.js 16 App Router · React 19 · TypeScript strict · Tailwind v4 (`@theme i
 - E2E: give each test its own `x-forwarded-for` (`uniqueIp`) so the per-IP login limit doesn't trip on the shared localhost IP.
 - Templates (ADR-016): every `--tpl-*` token used as a utility must be mapped in `globals.css` `@theme inline` (`--color-tpl-…`); an unmapped class compiles to nothing. Shared template CSS lives in `@layer components` so utilities win.
 - Templates never query the DB (ESLint): only `templates/shared/loaders` and `shared/sections.ts` may import Supabase clients or `*/queries`.
-- Public islands stay tiny: no `cn`/tailwind-merge or lucide in them. Next 16 + React 19 alone load ~132 KB gzipped (open question Q27). `StyleNonce` (Radix overlays) is admin-only.
+- Public islands stay tiny: no `cn`/tailwind-merge or lucide in them. Budget (ADR-017): the framework (~132 KB gzipped) plus at most 20 KB of our own JavaScript on public routes. `StyleNonce` (Radix overlays) is admin-only.
 - next/font fallbacks use `local(Arial)`/`local(Times New Roman)`, absent on Android and Linux. `src/lib/fonts/fallbacks.css` covers them; rerun `node scripts/generate-font-fallbacks.mjs` after adding a family.
 - Links named by their visible text: no `aria-label` that differs from it (WCAG 2.5.3). E2E axe runs after `settleEntrance()`, or contrast is measured mid-fade.
 - Glass (`.tpl-glass`) only on floating controls; backdrop blur only on fine pointers. `/preview/template/*` is the only frameable route (`'self'`).

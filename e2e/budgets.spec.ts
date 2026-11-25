@@ -5,10 +5,9 @@ import { expect, test } from './fixtures';
 /**
  * MP §10 performance budgets for public pages, measured on the production build.
  *
- * JavaScript: Next.js 16 and React 19 (pinned by MP §2) load their own runtime on every page; the
- * build manifest lists those files (rootMainFiles). Our islands are everything else, and are held
- * to 20 KB. The 120 KB total is recorded but cannot be met while the framework alone is larger;
- * see docs/plan/00-decisions.md (Q27).
+ * JavaScript (ADR-017): Next.js 16 and React 19 load their runtime on every page (the build
+ * manifest's rootMainFiles, about 132 KB gzipped). On top of that, our own code may add at most
+ * 20 KB. Every run records the total, framework and app sizes.
  */
 function frameworkFiles(): Set<string> {
   const manifest = JSON.parse(readFileSync('.next/build-manifest.json', 'utf8')) as {
@@ -54,18 +53,12 @@ function layoutShift(page: Page): Promise<number> {
 }
 
 test.describe('performance budgets', () => {
-  test('our own JavaScript on the homepage stays within 20 KB (gzipped)', async ({ page }) => {
+  test('our own JavaScript on the homepage stays within 20 KB gzipped (ADR-017)', async ({
+    page,
+  }) => {
     const { app, total } = await javascript(page);
     expect(total).toBeGreaterThan(0);
     expect(app).toBeLessThanOrEqual(20 * 1024);
-  });
-
-  test('first-load JavaScript within 120 KB gzipped (MP §10; framework floor, Q27)', async ({
-    page,
-  }) => {
-    test.fail(true, 'Next.js 16 + React 19 alone exceed 120 KB gzipped; decision Q27 pending');
-    const { total } = await javascript(page);
-    expect(total).toBeLessThanOrEqual(120 * 1024);
   });
 
   test('the hero image on a 360 px phone is AVIF and at most 200 KB', async ({ page }, info) => {

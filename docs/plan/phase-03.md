@@ -251,13 +251,13 @@ Evidence lives in `docs/plan/evidence/phase-03/`.
 | Hero image at 360 px | ✅ AVIF, 2.4 KB with the placeholder photo (budget 200 KB) |
 | Layout shift on load | ✅ 0.000 for the layout; 0.001 including the web-font swap |
 | Throttled phone (Pixel 7, CPU 4× slower, slow 4G), three runs | ✅ LCP 0.84–0.89 s and CLS 0.0003. **No long frame while scrolling.** The slide change produced 51–72 ms frames with at most 7 ms of script, well inside INP 200 ms (`smoothness-android.json`) |
-| First-load JavaScript ≤ 120 KB gzipped | ❌ **147 KB**: 132 KB is Next.js 16 + React 19 before any app code, 15 KB is ours (down from 25 KB). Open decision Q27 |
+| First-load JavaScript (ADR-017: framework + at most 20 KB of ours) | ✅ 147 KB: the framework is 132 KB, ours is 15 KB (down from 25 KB). MP §10's 120 KB total was restated in ADR-017 (Q27) |
 
 ### Changes against this plan
 
 - **21st.dev studies (your request).** The intuitive patterns adopted are expanding menu groups with pinned actions, a single slideshow capsule, and a progress dot that is the timer. The liquid-glass material is used only on floating controls. Scroll-drawn motion uses CSS timelines on transform only (ADR-016 §8).
 - **Fonts.** next/font's fallbacks assume Arial or Times New Roman, so matched faces for Android and Linux were added (`src/lib/fonts/fallbacks.css`, generated and tested). They cut the font-swap shift from 0.19 to 0.001. The fonts themselves stay on next/font with `swap` (MP §10). Self-hosting with a per-school preload needs new packages and was not done.
-- **JavaScript.** The slideshow island lost tailwind-merge and the icon runtime, and the CSP nonce helper moved to the admin layout. The 120 KB total can't be met by app changes (Q27); E2E holds our part to 20 KB and records the total.
+- **JavaScript.** The slideshow island lost tailwind-merge and the icon runtime, and the CSP nonce helper moved to the admin layout. The 120 KB total couldn't be met by app changes, so ADR-017 (Q27) budgets our part at 20 KB on top of the framework. E2E enforces that and records the total.
 - **Accessibility fixes found by E2E.** Logo links are now named by their visible text (WCAG 2.5.3). axe waits for the hero entrance, so it never measures contrast mid-fade.
 - **Preview bar.** The preview route shows a slim "Preview of … Nothing here is saved" bar with a link back to Appearance.
 - **Not built:** bespoke versions of every plan §3 signature section. Sections a template doesn't design use token-styled shared renderers, and the approved checkpoint pages show all of them.

@@ -100,7 +100,7 @@ Follows the Apple design guidance and the motion studies from 21st.dev:
 ## Consequences
 
 - **Switching templates changes nothing but `theme.template`.** This is proven by `template-switch.int.test.ts`: 36 tables, row counts and checksums; one audited `settings.updated` row per switch. Evidence: `docs/plan/evidence/phase-03/`.
-- **The 120 KB first-load JavaScript budget (MP §10) can't be met as written.** Next.js 16 and React 19 (pinned by MP §2) load 132 KB gzipped on every page before any app code (`rootMainFiles` in the build manifest). Our own JavaScript on the homepage is held to 20 KB in E2E (15 KB measured, down from 25 KB). The total is recorded, and the open decision is Q27.
+- **JavaScript budget:** Next.js 16 and React 19 load 132 KB gzipped on every page before any app code, more than MP §10's 120 KB. ADR-017 (Q27) restates the budget as the framework plus at most 20 KB of our own JavaScript (15 KB measured).
 - A new font family means two steps:
   1. Add it to `src/lib/fonts`.
   2. Rerun `node scripts/generate-font-fallbacks.mjs`.
