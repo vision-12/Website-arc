@@ -422,9 +422,15 @@ export function PageEditor(props: PageEditorProps) {
           </div>
 
           <div className="space-y-1.5" id="page-body">
-            <span className="text-sm font-medium" id="page-body-label">
-              Page text
-            </span>
+            <div className="flex items-center justify-between gap-2">
+              <span className="text-sm font-medium" id="page-body-label">
+                Page text
+              </span>
+              {/* On phones the Status card is below the editor: show the save state here too. */}
+              {editable ? (
+                <SaveStateIndicator state={autosave.state} announce={false} className="lg:hidden" />
+              ) : null}
+            </div>
             <RichTextEditor
               key={bodyKey}
               value={values.body}

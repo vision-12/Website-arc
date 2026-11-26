@@ -42,7 +42,7 @@ The open questions in spec §9 were not individually answered. Each one therefor
 | P4-E | `media_usages` is rebuilt by a database trigger in the same statement as the save | Spec §1.3: rebuilt by the app after each save |
 | P4-F | Rich-text images store only the media id; the file and description are resolved at render time | — |
 | P4-G | Uploads: SVG rejected until Phase 5 (logos); no blurhash (the blurred placeholder is enough). ADR-018 | Spec §4.2 SVG sanitisation, blurhash |
-| P4-H | Redirects are looked up only when a page isn't found, not by `proxy.ts` on every request | Spec §1.3 (`redirects` read by `proxy.ts`) |
-| P4-I | Scheduled publishing runs as a Vercel Schedule (or legacy cron if a Schedule can't send the bearer header) | Spec §4.8 `vercel.json` crons |
+| P4-H | **Revised during build:** `proxy.ts` answers old addresses with a 308 from an in-memory copy of `redirects`, refreshed every 30 s per server instance (no database query per request); the page route also looks one up on a miss. Planned as "page route only", but with Partial Prerendering a redirect from the page arrives as a 200 that only browsers follow (no `Location` header) | Spec §1.3 (proxy reads a cached map), refined |
+| P4-I | Scheduled publishing and housekeeping run as **Vercel Schedules with path targets** (`GET`, `Authorization: Bearer CRON_SECRET`, which path targets send). A private `function` target was not used: MP §5 specifies the `/api/cron/*` route with `CRON_SECRET`, App Router route handlers aren't standalone build-output functions, and the routes stay testable without Vercel | Spec §4.8 `vercel.json` crons |
 | P4-J | Pages are reordered with move buttons; drag-and-drop comes with Phase 5 | Spec §5.4 "drag to reorder/nest" (Phase 4 part) |
 | P4-L | Trash is emptied automatically by the Phase 13 retention job; until then nothing is deleted without a person | — |

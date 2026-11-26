@@ -69,11 +69,13 @@ const publicDb = (): DataClient => createPublicClient();
 async function resolveMedia(db: DataClient, ids: string[]): Promise<RichTextMedia> {
   const media: RichTextMedia = { images: {}, documents: {} };
   if (ids.length === 0) return media;
-  const { data } = await db
+  const { data, error } = await db
     .from('media_assets')
     .select('id, kind, bucket, path, width, height, alt_text, caption, lqip, size_bytes')
     .in('id', [...new Set(ids)])
     .is('deleted_at', null);
+  // Missing media is left out by design; a failed lookup would drop every photo, so say so (no data logged).
+  if (error) console.error('page media lookup failed', error.code);
   for (const m of data ?? []) {
     const url = publicObjectUrl(m.bucket, m.path);
     if (m.kind === 'image' && m.width && m.height && m.alt_text)

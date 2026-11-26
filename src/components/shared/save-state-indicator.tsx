@@ -6,13 +6,24 @@ export type SaveState = 'saved' | 'saving' | 'unsaved';
 
 const ICONS = { saved: CheckCircle2, saving: Loader2, unsaved: CloudOff } as const;
 
-/** The three save states every admin form shows (MP §11). Announced politely to screen readers. */
-export function SaveStateIndicator({ state, className }: { state: SaveState; className?: string }) {
+/**
+ * The three save states every admin form shows (MP §11). Announced politely to screen readers.
+ * `announce={false}` draws a visual-only copy (e.g. near the editor on phones) so the state isn't
+ * announced twice.
+ */
+export function SaveStateIndicator({
+  state,
+  className,
+  announce = true,
+}: {
+  state: SaveState;
+  className?: string;
+  announce?: boolean;
+}) {
   const Icon = ICONS[state];
   return (
     <p
-      role="status"
-      aria-live="polite"
+      {...(announce ? { role: 'status', 'aria-live': 'polite' as const } : { 'aria-hidden': true })}
       data-state={state}
       className={cn(
         'inline-flex items-center gap-1.5 text-sm',

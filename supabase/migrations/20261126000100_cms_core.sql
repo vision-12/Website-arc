@@ -234,6 +234,9 @@ end $$;
 create trigger media_assets_confirm before insert or update on public.media_assets
   for each row execute function private.media_confirm_guard();
 
+-- Public PDF links say how big the file is ("PDF, 240 KB"); a public file's size isn't sensitive.
+grant select (size_bytes) on public.media_assets to anon;
+
 drop policy media_assets_select on public.media_assets;
 create policy media_assets_select on public.media_assets for select to anon, authenticated
   using ((deleted_at is null and confirmed_at is not null) or (select public.has_permission('media.view')));

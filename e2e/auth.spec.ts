@@ -25,10 +25,14 @@ const S = {
   users: 'Users & permissions',
   settings: 'Settings',
   activity: 'Activity log',
+  trash: 'Trash',
 };
 const CONTENT_VIEWS = [S.pages, S.news, S.academics, S.events, S.gallery, S.staff, S.resources];
 
-/** Expected sidebar per role = sections whose view permission the role holds (spec §2.5). */
+/**
+ * Expected sidebar per role = sections whose view permission the role holds (spec §2.5), plus Trash
+ * for roles that can delete something (spec §5.4).
+ */
 const SIDEBAR: Record<string, string[]> = {
   school_admin: Object.values(S),
   headteacher: [
@@ -47,8 +51,8 @@ const SIDEBAR: Record<string, string[]> = {
     S.users,
     S.activity,
   ],
-  content_editor: [S.overview, ...CONTENT_VIEWS, S.media, S.appearance],
-  events_manager: [S.overview, ...CONTENT_VIEWS, S.media],
+  content_editor: [S.overview, ...CONTENT_VIEWS, S.media, S.appearance, S.trash],
+  events_manager: [S.overview, ...CONTENT_VIEWS, S.media, S.trash],
   read_only_staff: [S.overview, ...CONTENT_VIEWS, S.media, S.appearance],
   platform_support: [S.overview, ...CONTENT_VIEWS, S.media, S.appearance, S.settings, S.activity],
 };

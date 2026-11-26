@@ -1,0 +1,135 @@
+# Phase 4 verification (2026-11-26T06:59:15Z), local Supabase stack + production build
+
+## supabase db reset (fresh database, all migrations + seed)
+Seeding globals from roles.sql...
+Applying migration 20261123000100_foundation.sql...
+Applying migration 20261123000200_enums.sql...
+Applying migration 20261123000300_rbac.sql...
+Applying migration 20261123000400_audit.sql...
+Applying migration 20261123000500_settings.sql...
+Applying migration 20261123000600_security_infra.sql...
+Applying migration 20261123000700_auth_admin_jobs.sql...
+Applying migration 20261123000800_lifecycle.sql...
+Applying migration 20261123000900_media_pages.sql...
+Applying migration 20261123001000_enquiries.sql...
+Applying migration 20261123001100_admissions_core.sql...
+Applying migration 20261123001200_email.sql...
+Applying migration 20261123001300_storage.sql...
+Applying migration 20261123001400_reference_data.sql...
+Applying migration 20261123001500_session_rpcs.sql...
+Applying migration 20261126000100_cms_core.sql...
+Seeding data from supabase/seed.sql...
+Seeding data from supabase/seed/demo-media.sql...
+Seeding data from supabase/seed/demo-content.sql...
+Finished supabase db reset on branch claude/vibrant-tesla-w9t4vf.
+
+## npm run test:db (pgTAP)
+/home/user/Website-arc/supabase/tests/000_setup_helpers.sql ....... ok
+/home/user/Website-arc/supabase/tests/00_rls_enabled.sql .......... ok
+/home/user/Website-arc/supabase/tests/01_policy_uid_initplan.sql .. ok
+/home/user/Website-arc/supabase/tests/02_definer_search_path.sql .. ok
+/home/user/Website-arc/supabase/tests/03_policy_text.sql .......... ok
+/home/user/Website-arc/supabase/tests/10_anon_reads.sql ........... ok
+/home/user/Website-arc/supabase/tests/11_anon_writes.sql .......... ok
+/home/user/Website-arc/supabase/tests/20_role_isolation.sql ....... ok
+/home/user/Website-arc/supabase/tests/21_deactivated.sql .......... ok
+/home/user/Website-arc/supabase/tests/22_escalation.sql ........... ok
+/home/user/Website-arc/supabase/tests/23_mfa.sql .................. ok
+/home/user/Website-arc/supabase/tests/24_support_access.sql ....... ok
+/home/user/Website-arc/supabase/tests/25_session_rpcs.sql ......... ok
+/home/user/Website-arc/supabase/tests/30_lifecycle.sql ............ ok
+/home/user/Website-arc/supabase/tests/31_append_only.sql .......... ok
+/home/user/Website-arc/supabase/tests/32_audit_trail.sql .......... ok
+/home/user/Website-arc/supabase/tests/33_content_drafts.sql ....... ok
+/home/user/Website-arc/supabase/tests/34_media_usages.sql ......... ok
+/home/user/Website-arc/supabase/tests/35_publish_due.sql .......... ok
+/home/user/Website-arc/supabase/tests/36_pages_tree.sql ........... ok
+/home/user/Website-arc/supabase/tests/37_dashboard.sql ............ ok
+/home/user/Website-arc/supabase/tests/40_submit_application.sql ... 
+# Failed (TODO) test 1: "submit_application rejects a client-supplied status"
+# Failed (TODO) test 2: "submit_application rejects a client-supplied reference"
+ok
+/home/user/Website-arc/supabase/tests/41_reference.sql ............ ok
+/home/user/Website-arc/supabase/tests/44_storage_staff.sql ........ ok
+/home/user/Website-arc/supabase/tests/45_auth_admin_jobs.sql ...... ok
+All tests successful.
+Files=25, Tests=201,  2 wallclock secs ( 0.10 usr  0.03 sys +  0.22 cusr  0.08 csys =  0.43 CPU)
+Result: PASS
+
+## npm run db:lint && node scripts/check-advisors.mjs
+No schema errors found
+Supabase advisors: no findings.
+
+## npm run typecheck
+Generating route types...
+✓ Types generated successfully
+
+## npm run lint
+> altrastate-school@0.1.0 lint
+> eslint . --max-warnings=0
+(no output = no problems; --max-warnings=0)
+
+## npm run check:actions && npm run check:school-values
+check-actions: every feature action goes through defineAction/defineUserAction
+check-school-values: no school-specific values in src/
+
+## npm run test -- --coverage (unit)
+ Test Files  44 passed (44)
+      Tests  282 passed (282)
+File               | % Stmts | % Branch | % Funcs | % Lines | Uncovered Line #s 
+All files          |   93.04 |    87.29 |   92.14 |   92.97 |                   
+
+## npm run test:int (integration, local stack)
+ Test Files  7 passed (7)
+      Tests  107 passed (107)
+
+## npm run build (route table, Phase 4 routes)
+Route (app)                                              Revalidate  Expire
+├   /[...slug]                                                   1h      1d
+│ ├ ◐ /[...slug]                                                 1h      1d
+├ ◐ /admin/media                                                 1h      1d
+├ ◐ /admin/overview                                              1h      1d
+├ ◐ /admin/pages                                                 1h      1d
+├   /admin/pages/[id]                                            1h      1d
+│ └ ◐ /admin/pages/[id]                                          1h      1d
+├ ◐ /admin/trash                                                 1h      1d
+├ ƒ /api/cron/housekeeping
+├ ƒ /api/cron/publish
+├ ƒ /api/draft
+├ ƒ /api/draft/disable
+◐  (Partial Prerender)  prerendered as static HTML with dynamic server-streamed content
+ƒ  (Dynamic)            server-rendered on demand
+
+## npm run e2e (Playwright + axe + CSP guard; projects desktop 1280, mobile-360, android, approval)
+  40 skipped
+  144 passed (4.2m)
+
+### Phase 4 specs (cms.spec.ts, approval.spec.ts), every project
+✓   32 [desktop] › e2e/cms.spec.ts:146:3 › two people editing the same page (MP §5 optimistic concurrency) › the second publish gets the conflict message; nothing is overwritten
+✓   33 [desktop] › e2e/cms.spec.ts:222:3 › Trash, addresses and media › trash and restore a page; visitors lose it and get it back
+✓   34 [desktop] › e2e/cms.spec.ts:270:3 › Trash, addresses and media › changing a live page’s address leaves a 308 from the old one
+✓   35 [desktop] › e2e/cms.spec.ts:304:3 › Trash, addresses and media › a photo used on a page cannot be trashed; the library offers Replace
+✓   36 [desktop] › e2e/cms.spec.ts:337:3 › who sees what (PRD §6.2) › read-only staff can look at pages but not change them, and see no Trash
+✓   37 [desktop] › e2e/cms.spec.ts:351:3 › who sees what (PRD §6.2) › the dashboard shows the content editor what needs doing, each tile a link
+✓   38 [desktop] › e2e/cms.spec.ts:368:3 › screens on every screen size (axe, 360 px and 1280 px) › pages list, editor and media library
+✓   39 [desktop] › e2e/cms.spec.ts:390:3 › screens on every screen size (axe, 360 px and 1280 px) › a published CMS page in the school’s template
+✓   31 [desktop] › e2e/cms.spec.ts:22:3 › pages: the editor’s journey › create, add a described photo, autosave, preview, schedule and publish by the job (1.9m)
+-   92 [mobile-360] › e2e/cms.spec.ts:22:3 › pages: the editor’s journey › create, add a described photo, autosave, preview, schedule and publish by the job
+-   93 [mobile-360] › e2e/cms.spec.ts:146:3 › two people editing the same page (MP §5 optimistic concurrency) › the second publish gets the conflict message; nothing is overwritten
+-   94 [mobile-360] › e2e/cms.spec.ts:222:3 › Trash, addresses and media › trash and restore a page; visitors lose it and get it back
+-   95 [mobile-360] › e2e/cms.spec.ts:270:3 › Trash, addresses and media › changing a live page’s address leaves a 308 from the old one
+-   96 [mobile-360] › e2e/cms.spec.ts:304:3 › Trash, addresses and media › a photo used on a page cannot be trashed; the library offers Replace
+✓   97 [mobile-360] › e2e/cms.spec.ts:337:3 › who sees what (PRD §6.2) › read-only staff can look at pages but not change them, and see no Trash
+✓   98 [mobile-360] › e2e/cms.spec.ts:351:3 › who sees what (PRD §6.2) › the dashboard shows the content editor what needs doing, each tile a link
+✓  100 [mobile-360] › e2e/cms.spec.ts:390:3 › screens on every screen size (axe, 360 px and 1280 px) › a published CMS page in the school’s template
+✓   99 [mobile-360] › e2e/cms.spec.ts:368:3 › screens on every screen size (axe, 360 px and 1280 px) › pages list, editor and media library
+-  153 [android] › e2e/cms.spec.ts:22:3 › pages: the editor’s journey › create, add a described photo, autosave, preview, schedule and publish by the job
+-  154 [android] › e2e/cms.spec.ts:146:3 › two people editing the same page (MP §5 optimistic concurrency) › the second publish gets the conflict message; nothing is overwritten
+-  155 [android] › e2e/cms.spec.ts:222:3 › Trash, addresses and media › trash and restore a page; visitors lose it and get it back
+-  156 [android] › e2e/cms.spec.ts:270:3 › Trash, addresses and media › changing a live page’s address leaves a 308 from the old one
+-  157 [android] › e2e/cms.spec.ts:304:3 › Trash, addresses and media › a photo used on a page cannot be trashed; the library offers Replace
+✓  158 [android] › e2e/cms.spec.ts:337:3 › who sees what (PRD §6.2) › read-only staff can look at pages but not change them, and see no Trash
+✓  159 [android] › e2e/cms.spec.ts:351:3 › who sees what (PRD §6.2) › the dashboard shows the content editor what needs doing, each tile a link
+✓  161 [android] › e2e/cms.spec.ts:390:3 › screens on every screen size (axe, 360 px and 1280 px) › a published CMS page in the school’s template
+✓  160 [android] › e2e/cms.spec.ts:368:3 › screens on every screen size (axe, 360 px and 1280 px) › pages list, editor and media library
+✓  184 [approval] › e2e/approval.spec.ts:25:1 › editors submit for approval; the headteacher sees it on the dashboard and publishes

@@ -3,7 +3,7 @@
 -- cannot be trashed or lose its description. Uploads stay invisible until the server has checked
 -- them, and the media bucket no longer accepts SVG (plan P4-G).
 begin;
-select plan(15);
+select plan(17);
 
 insert into public.roles (key, name, is_system) values ('uploader_only', 'Uploader', false);
 insert into public.role_permissions (role_id, permission_key)
@@ -93,6 +93,11 @@ select tests.as_system();
 select is((select count(*)::int from public.media_usages where entity_id = '34000000-0000-4000-8000-000000000001'), 0,
   'purging a page clears its usages');
 
+select ok(has_column_privilege('anon', 'public.media_assets', 'size_bytes', 'select'),
+  'visitors can see a public file''s size (PDF links show it)');
+select ok(not has_column_privilege('anon', 'public.media_assets', 'original_filename', 'select')
+  and not has_column_privilege('anon', 'public.media_assets', 'uploaded_by', 'select'),
+  '... but not who uploaded it or its original file name');
 select is((select 'image/svg+xml' = any (allowed_mime_types) from storage.buckets where id = 'media'), false,
   'the media bucket refuses SVG until it can be sanitised (Phase 5)');
 

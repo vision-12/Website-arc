@@ -1,6 +1,6 @@
 # Phase 4 — CMS core (plan)
 
-**Status:** **In progress.** Plan approved 25 Nov 2026 (P4-A … P4-L as recommended; Q4, Q10 and Q24 confirmed).
+**Status:** **Done** (26 Nov 2026). Plan approved 25 Nov 2026 (P4-A … P4-L as recommended; Q4, Q10 and Q24 confirmed). Outcome and changes against this plan: §13.
 **Inputs:**
 - MP §5 (shared content lifecycle), §5.9 (Pages & CMS), §5.10 (Admin dashboard), §7.4 (storage), §7.5 (rich text), §11 (admin UX) and §12 (Phase 4 prompt, Definition of Done)
 - Spec D2–D4, D7, D12, §1.3–1.4, §2.3, §3.1, §3.4, §3.9, §4.0–4.2, §4.8, §5.0, §5.1 (`/[...slug]`, `/about`, `/legal`), §5.4 (`/admin/overview`, `/admin/pages`, `/admin/media`, `/admin/trash`), §8
@@ -214,3 +214,36 @@ I'll send screenshots of the editor and the media library (360 px and 1280 px) a
 - Homepage builder, appearance screen, drag-and-drop, SVG logos, About and Legal *content* (Phase 5). Phase 4 renders any page at any path, including those trees.
 - Embeds (YouTube, Vimeo, Maps) in rich text: Phase 9 (video, Q23) and Phase 11 (maps).
 - Review-request emails (Phase 11, P4-A), automatic Trash emptying (Phase 13, P4-L), site search `/search` and `sitemap.xml` (Phase 6, when there is more than pages to index), the activity-log screen (Phase 13).
+
+## 13. Outcome (26 Nov 2026)
+
+### Definition of Done (MP §12), item by item
+
+Evidence lives in `docs/plan/evidence/phase-04/`.
+
+| Item | Result | Evidence |
+|---|---|---|
+| Migrations applied cleanly to a fresh DB | ✅ one migration, `20261126000100_cms_core.sql`; `supabase db reset` applies all 16 cleanly | `verification.txt` |
+| RLS + pgTAP pass | ✅ 25 files, 201 assertions. The five new files (`33`–`37`) and the `30_lifecycle` additions were run red first | `pgtap-red.txt`, `verification.txt` |
+| Zod schemas shared client/server | ✅ page, media and schedule schemas are checked in the browser (editor, picker, dialogs) and again in the actions | unit and integration tests |
+| Every action calls `requirePermission` | ✅ `check:actions`; the action matrix covers all 26 page and media actions (signed out, no permission, invalid input) and fails if a new action has no row | `verification.txt` |
+| Unit + integration tests | ✅ unit 282 (93 % statements); integration 107, including the media flow, the page lifecycle, conflicts, approval, Trash, the cron routes and the matrix | `verification.txt` |
+| E2E incl. axe; screenshots at 360 px and 1280 px | ✅ full suite: 144 passed, 0 failed, 40 skipped by design (journeys that run once, at desktop width). Every page checked is axe-clean and CSP-clean; Phase 4 screens at 360 px and 1280 px | `verification.txt`, `screenshots/` |
+| Typecheck, lint and build clean | ✅ new page routes are ◐ (partial prerender); cron and draft routes are ƒ | `verification.txt` |
+| Audit entries written | ✅ create, publish, schedule, unpublish, trash, restore, purge, move, reorder; media upload, update, replace, trash, restore, purge; the job writes `pages.publish` with `source = cron` (asserted in integration tests and `35_publish_due.sql`) | |
+| Admin-guide pages | ✅ `dashboard.md`, `pages.md`, `publishing.md`, `media-library.md`, `trash.md` | |
+| `progress.md` updated; no TODOs without an issue link | ✅ | |
+| **Phase goal (§1)** | ✅ E2E "create, add a described photo, autosave, preview, schedule and publish by the job" and "the second publish gets the conflict message; nothing is overwritten" | `screenshots/` |
+
+### Changes against this plan
+
+- **Redirects (P4-H, revised).** The plan looked redirects up only in the page route. With Partial Prerendering, a page's redirect arrives as a 200 with the redirect in its payload (no `Location` header), which only browsers follow. `proxy.ts` now answers old addresses with a real 308 from an in-memory copy of the `redirects` table, refreshed every 30 seconds per server instance, so there is no database query per request. The page route still looks one up on a miss, covering the first seconds after a rename. Mixed-case addresses get a 308 to lower case.
+- **Not-found pages.** An address the server has never rendered gets a soft "not found" on its first visit (status 200 with `noindex`, Next.js's documented behaviour with Cache Components) and a real 404 after that. The CMS route is a blocking route (`instant = false`), so it never sends an empty shell.
+- **Scheduler (P4-I).** Vercel Schedules with path targets (they send `Authorization: Bearer CRON_SECRET`), plus an hourly housekeeping route that removes abandoned uploads and orphaned files.
+- **Approval flag.** `approvalOn()` reads the live setting instead of the cached settings, so the buttons always match what the database enforces.
+- **Not in the plan, needed:**
+  - Zod's JIT probe (`new Function`) is a CSP violation, so all Zod imports go through `src/lib/zod.ts` with `jitless` (ESLint-enforced).
+  - Tiptap's injected `<style>` was replaced by our stylesheet (no nonce possible).
+  - The editor sends a plain JSON copy of the document: ProseMirror's null-prototype attributes were silently dropped by Server Actions, and photos lost their media id.
+  - Visitors can read `media_assets.size_bytes` (for "PDF, 240 KB"). Without the grant, the public media query failed as a whole and photos disappeared from pages.
+- **Screenshots checkpoint.** The editor and library screenshots planned for after step 3 are in `screenshots/`, together with the rest.
