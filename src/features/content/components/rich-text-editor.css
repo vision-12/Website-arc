@@ -1,0 +1,141 @@
+/*
+ * Editor typography for the admin (the public site's .tpl-prose lives in the template CSS, which the
+ * admin does not load). Kept close to the public look so editors see roughly what visitors see.
+ */
+.rte-content {
+  line-height: 1.7;
+  font-size: 1rem;
+}
+.rte-content > * + * {
+  margin-top: 1em;
+}
+.rte-content :where(h2, h3, h4) {
+  margin-top: 1.6em;
+  line-height: 1.25;
+  font-weight: 600;
+}
+.rte-content h2 {
+  font-size: 1.5rem;
+}
+.rte-content h3 {
+  font-size: 1.25rem;
+}
+.rte-content h4 {
+  font-size: 1.1rem;
+}
+.rte-content :where(ul, ol) {
+  padding-left: 1.25rem;
+}
+.rte-content ul {
+  list-style: disc;
+}
+.rte-content ol {
+  list-style: decimal;
+}
+.rte-content li + li {
+  margin-top: 0.35em;
+}
+.rte-content a {
+  text-decoration: underline;
+  text-underline-offset: 0.2em;
+}
+.rte-content blockquote {
+  border-left: 3px solid var(--border);
+  padding-left: 1rem;
+  color: var(--muted-foreground);
+}
+.rte-content hr {
+  border: 0;
+  border-top: 1px solid var(--border);
+  margin-block: 2em;
+}
+.rte-content.ProseMirror-focused {
+  outline: none;
+}
+/* "Start writing…" until the first character (Tiptap Placeholder). */
+.rte-content p.is-editor-empty:first-child::before {
+  content: attr(data-placeholder);
+  float: left;
+  height: 0;
+  pointer-events: none;
+  color: var(--muted-foreground);
+}
+.rte-content .ProseMirror-selectednode {
+  outline: 3px solid var(--ring);
+}
+
+/*
+ * Tiptap's base editor styles, copied from @tiptap/core 3.33. The editor runs with injectCSS: false
+ * because an injected <style> element has no CSP nonce (CLAUDE.md, ADR-000).
+ */
+.ProseMirror {
+  position: relative;
+}
+
+.ProseMirror {
+  word-wrap: break-word;
+  white-space: pre-wrap;
+  white-space: break-spaces;
+  -webkit-font-variant-ligatures: none;
+  font-variant-ligatures: none;
+  font-feature-settings: 'liga' 0; /* the above doesn't seem to work in Edge */
+}
+
+.ProseMirror [contenteditable='false'] {
+  white-space: normal;
+}
+
+.ProseMirror [contenteditable='false'] [contenteditable='true'] {
+  white-space: pre-wrap;
+}
+
+.ProseMirror pre {
+  white-space: pre-wrap;
+}
+
+img.ProseMirror-separator {
+  display: inline !important;
+  border: none !important;
+  margin: 0 !important;
+  width: 0 !important;
+  height: 0 !important;
+}
+
+.ProseMirror-gapcursor {
+  display: none;
+  pointer-events: none;
+  position: absolute;
+  margin: 0;
+}
+
+.ProseMirror-gapcursor:after {
+  content: '';
+  display: block;
+  position: absolute;
+  top: -2px;
+  width: 20px;
+  border-top: 1px solid black;
+  animation: ProseMirror-cursor-blink 1.1s steps(2, start) infinite;
+}
+
+@keyframes ProseMirror-cursor-blink {
+  to {
+    visibility: hidden;
+  }
+}
+
+.ProseMirror-hideselection *::selection {
+  background: transparent;
+}
+
+.ProseMirror-hideselection *::-moz-selection {
+  background: transparent;
+}
+
+.ProseMirror-hideselection * {
+  caret-color: transparent;
+}
+
+.ProseMirror-focused .ProseMirror-gapcursor {
+  display: block;
+}

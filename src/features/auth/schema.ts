@@ -1,4 +1,4 @@
-import { z } from 'zod';
+import { z } from '@/lib/zod';
 
 /** Shared client/server validation for the sign-in screens (UK English, plain language). */
 // Trim before validating: addresses pasted on phones often carry a trailing space.

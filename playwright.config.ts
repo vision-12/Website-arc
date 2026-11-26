@@ -17,9 +17,11 @@ export default defineConfig({
     trace: 'off',
     screenshot: 'only-on-failure',
   },
+  // The approval-workflow test switches a site-wide setting, so it runs alone after the rest.
   projects: [
     {
       name: 'desktop',
+      testIgnore: /approval\.spec\.ts/,
       use: {
         ...devices['Desktop Chrome'],
         viewport: { width: 1280, height: 800 },
@@ -28,6 +30,7 @@ export default defineConfig({
     },
     {
       name: 'mobile-360',
+      testIgnore: /approval\.spec\.ts/,
       use: {
         ...devices['Desktop Chrome'],
         viewport: { width: 360, height: 740 },
@@ -36,7 +39,13 @@ export default defineConfig({
         hasTouch: true,
       },
     },
-    { name: 'android', use: { ...devices['Pixel 7'] } },
+    { name: 'android', testIgnore: /approval\.spec\.ts/, use: { ...devices['Pixel 7'] } },
+    {
+      name: 'approval',
+      testMatch: /approval\.spec\.ts/,
+      dependencies: ['desktop', 'mobile-360', 'android'],
+      use: { ...devices['Desktop Chrome'], viewport: { width: 1280, height: 800 } },
+    },
   ],
   // Runs against a production build (`npm run build` first) so CSP and caching behave as in production.
   webServer: {

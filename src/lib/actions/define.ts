@@ -15,13 +15,22 @@ export interface ActionContext {
  */
 export function defineAction<S extends z.ZodType, T>(config: {
   input: S;
-  permission: string;
+  /**
+   * The permission key, or a function of the parsed input that returns it. Use the function form
+   * only when the rule depends on settings, e.g. publishing needs `approve` instead of `publish`
+   * when the school's approval workflow is on (spec §2.3).
+   */
+  permission: string | ((input: z.infer<S>) => string | Promise<string>);
   handler: (input: z.infer<S>, ctx: ActionContext) => Promise<T>;
 }): (raw: unknown) => Promise<Result<T>> {
   return async (raw: unknown) => {
     try {
       const input: z.infer<S> = config.input.parse(raw);
-      const access = await requirePermission(config.permission);
+      const permission =
+        typeof config.permission === 'function'
+          ? await config.permission(input)
+          : config.permission;
+      const access = await requirePermission(permission);
       return ok(await config.handler(input, { access }));
     } catch (error) {
       return { ok: false, error: toActionError(error) };

@@ -1031,6 +1031,7 @@ export type Database = {
           blurhash: string | null;
           bucket: string;
           caption: string | null;
+          confirmed_at: string | null;
           created_at: string;
           deleted_at: string | null;
           deleted_by: string | null;
@@ -1054,6 +1055,7 @@ export type Database = {
           blurhash?: string | null;
           bucket: string;
           caption?: string | null;
+          confirmed_at?: string | null;
           created_at?: string;
           deleted_at?: string | null;
           deleted_by?: string | null;
@@ -1076,6 +1078,7 @@ export type Database = {
           blurhash?: string | null;
           bucket?: string;
           caption?: string | null;
+          confirmed_at?: string | null;
           created_at?: string;
           deleted_at?: string | null;
           deleted_by?: string | null;
@@ -1652,8 +1655,26 @@ export type Database = {
     };
     Functions: {
       accept_invite: { Args: { p_full_name: string }; Returns: undefined };
+      content_editors: {
+        Args: { p_entity_id: string; p_entity_type: string };
+        Returns: {
+          base_version: number;
+          full_name: string;
+          updated_at: string;
+          user_id: string;
+        }[];
+      };
+      get_dashboard_counts: { Args: Record<PropertyKey, never>; Returns: Json };
       has_permission: { Args: { p: string }; Returns: boolean };
       housekeeping: { Args: Record<PropertyKey, never>; Returns: Json };
+      latest_review_note: {
+        Args: { p_entity_id: string; p_entity_type: string };
+        Returns: {
+          author: string;
+          created_at: string;
+          note: string;
+        }[];
+      };
       log_activity: {
         Args: {
           p_action: string;
@@ -1667,9 +1688,29 @@ export type Database = {
         Returns: number;
       };
       my_access: { Args: Record<PropertyKey, never>; Returns: Json };
+      publish_due_content: {
+        Args: Record<PropertyKey, never>;
+        Returns: {
+          entity_id: string;
+          entity_table: string;
+          path: string;
+        }[];
+      };
       rate_limit_check_auth: { Args: { p_payload: string; p_ticket: Json }; Returns: boolean };
       record_login: { Args: Record<PropertyKey, never>; Returns: undefined };
+      reorder_pages: { Args: { p_ids: string[]; p_parent?: string }; Returns: undefined };
       revoke_user_sessions: { Args: { p_user: string }; Returns: number };
+      save_working_copy: {
+        Args: { p_base_version: number; p_data: Json; p_entity_id: string; p_entity_type: string };
+        Returns: string;
+      };
+      staff_names: {
+        Args: { p_ids: string[] };
+        Returns: {
+          full_name: string;
+          id: string;
+        }[];
+      };
       update_private_settings: { Args: { p_value: Json; p_version: number }; Returns: number };
       update_site_settings: {
         Args: { p_section: string; p_value: Json; p_version: number };

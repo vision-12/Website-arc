@@ -1,14 +1,11 @@
 import 'server-only';
 import { cacheLife, cacheTag } from 'next/cache';
 import { CacheTags } from '@/lib/cache/tags';
-import { publicEnv } from '@/lib/env/public';
+import { publicObjectUrl } from '@/lib/storage/public-url';
 import { createPublicClient } from '@/lib/supabase/server';
 import type { ImageRef } from '../../types';
 
-/** Public URL of an object in a public bucket (the `media` bucket is read by URL, never listed). */
-export function publicObjectUrl(bucket: string, path: string): string {
-  return `${publicEnv.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/${bucket}/${path}`;
-}
+export { publicObjectUrl };
 
 /**
  * Resolves media ids to presentation-ready images. Unknown, deleted or non-image ids are simply

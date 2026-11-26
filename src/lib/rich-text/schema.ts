@@ -1,4 +1,4 @@
-import { z } from 'zod';
+import { z } from '@/lib/zod';
 
 /**
  * A Tiptap JSON document as stored in the database. The renderer checks the structure against the

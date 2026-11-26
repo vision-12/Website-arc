@@ -9,6 +9,11 @@ export interface CspOptions {
   isDev?: boolean;
   /** 'self' only for the template preview, which the Appearance page embeds (spec §6.4). */
   frameAncestors?: 'none' | 'self';
+  /**
+   * Admin pages only: lets WebAssembly compile, for converting iPhone (HEIC) photos in the browser
+   * before upload (ADR-018). It does not allow eval() of strings.
+   */
+  allowWasm?: boolean;
 }
 
 /** Third-party hosts the site may show images from (video thumbnails, static maps). */
@@ -32,6 +37,7 @@ export function buildCsp({
   supabaseUrl,
   isDev = false,
   frameAncestors = 'none',
+  allowWasm = false,
 }: CspOptions): string {
   if (!/^[A-Za-z0-9+/=_-]{16,}$/.test(nonce)) throw new Error('CSP nonce is missing or malformed');
   const supabase = new URL(supabaseUrl).origin;
@@ -43,6 +49,7 @@ export function buildCsp({
       "'self'",
       `'nonce-${nonce}'`,
       "'sha256-7mu4H06fwDCjmnxxr/xNHyuQC6pLTHr4M2E4jXw5WZs='",
+      ...(allowWasm ? ["'wasm-unsafe-eval'"] : []),
       ...(isDev ? ["'unsafe-eval'"] : []),
     ],
     // <style> elements need the nonce. Inline style *attributes* (emitted by React/next/image for

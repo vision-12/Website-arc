@@ -1,5 +1,5 @@
 import { createHmac, timingSafeEqual } from 'node:crypto';
-import { z } from 'zod';
+import { z } from '@/lib/zod';
 import { PreviewOverrides, TemplateKey } from './schema';
 
 /**

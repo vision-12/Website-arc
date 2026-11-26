@@ -6,6 +6,11 @@ Plain-language guides for school staff (PRD §17.1). Each "?" help link in the a
 | ---------------------------- | ---------------------- | -------------- |
 | Logging in and your account  | `logging-in.md`        | Phase 2        |
 | Website templates            | `website-templates.md` | Phase 3        |
+| The Overview (dashboard)     | `dashboard.md`         | Phase 4        |
+| Website pages                | `pages.md`             | Phase 4        |
+| Publishing and scheduling    | `publishing.md`        | Phase 4        |
+| The media library            | `media-library.md`     | Phase 4        |
+| Trash                        | `trash.md`             | Phase 4        |
 | Updating the homepage        | `homepage.md`          | Phase 5        |
 | Publishing announcements     | `news.md`              | Phase 6        |
 | Uploading photographs        | `gallery.md`           | Phase 9        |
@@ -19,3 +24,5 @@ Plain-language guides for school staff (PRD §17.1). Each "?" help link in the a
 Phase 2 added signing in, invitations, two-step sign-in and the account page.
 
 Phase 3 added the four website templates (`website-templates.md`).
+
+Phase 4 added the Overview, website pages, publishing (preview, scheduling, approval), the media library and Trash.

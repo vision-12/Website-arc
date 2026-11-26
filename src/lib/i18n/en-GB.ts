@@ -42,12 +42,10 @@ export const enGB = {
       users: 'Users & permissions',
       settings: 'Settings',
       activity: 'Activity log',
+      trash: 'Trash',
     },
     overview: {
       heading: 'Overview',
-      emptyTitle: 'Your dashboard is getting ready',
-      emptyBody:
-        'This page will show applications waiting for a decision, new enquiries, upcoming events and recent changes to the website.',
     },
     sectionEmpty: {
       title: 'This section is not available yet',

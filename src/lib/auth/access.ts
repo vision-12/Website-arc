@@ -1,6 +1,6 @@
 import 'server-only';
 import { cache } from 'react';
-import { z } from 'zod';
+import { z } from '@/lib/zod';
 import { createClient } from '@/lib/supabase/server';
 import { ForbiddenError, MfaRequiredError, UnauthenticatedError } from './errors';
 

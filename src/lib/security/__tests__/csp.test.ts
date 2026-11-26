@@ -53,6 +53,15 @@ describe('buildCsp', () => {
     expect(dev['upgrade-insecure-requests']).toBeUndefined();
   });
 
+  it('lets WebAssembly compile only where asked (admin HEIC conversion, ADR-018), never string eval', () => {
+    const admin = parse(
+      buildCsp({ nonce, supabaseUrl: 'https://abcd.supabase.co', allowWasm: true }),
+    );
+    expect(admin['script-src']).toContain("'wasm-unsafe-eval'");
+    expect(admin['script-src']).not.toContain("'unsafe-eval'");
+    expect(prod['script-src']).not.toContain("'wasm-unsafe-eval'");
+  });
+
   it('rejects a missing nonce', () => {
     expect(() => buildCsp({ nonce: '', supabaseUrl: 'https://abcd.supabase.co' })).toThrow(/nonce/);
   });

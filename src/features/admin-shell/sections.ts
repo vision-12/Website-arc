@@ -12,6 +12,7 @@ import {
   Newspaper,
   Palette,
   Settings,
+  Trash2,
   Users,
   UsersRound,
   type LucideIcon,
@@ -35,6 +36,7 @@ export const ADMIN_SECTION_KEYS = [
   'users',
   'settings',
   'activity',
+  'trash',
 ] as const;
 export type AdminSectionKey = (typeof ADMIN_SECTION_KEYS)[number];
 
@@ -45,7 +47,22 @@ export interface AdminSection {
   icon: LucideIcon;
   /** Permission needed to see the section (spec §2). `null` = any signed-in staff member. */
   permission: `${string}.view` | null;
+  /** Instead of `permission`: visible with any one of these (Trash: any `.delete`). */
+  anyOf?: readonly string[];
 }
+
+/** Everything that can be moved to Trash, plus permanent delete (spec §5.4 `/admin/trash`). */
+export const TRASH_PERMISSIONS = [
+  'pages.delete',
+  'news.delete',
+  'academics.delete',
+  'events.delete',
+  'gallery.delete',
+  'staff.delete',
+  'resources.delete',
+  'media.delete',
+  'trash.purge',
+] as const;
 
 /** PRD §6.2 order. */
 export const ADMIN_SECTIONS: readonly AdminSection[] = [
@@ -154,16 +171,28 @@ export const ADMIN_SECTIONS: readonly AdminSection[] = [
     icon: Activity,
     permission: 'activity.view',
   },
+  {
+    key: 'trash',
+    labelKey: 'admin.sections.trash',
+    href: '/admin/trash',
+    icon: Trash2,
+    permission: null,
+    anyOf: TRASH_PERMISSIONS,
+  },
 ];
+
+/** Whether a set of granted permissions may see a section. */
+export function sectionAllowed(section: AdminSection, granted: ReadonlySet<string>): boolean {
+  if (section.anyOf) return section.anyOf.some((p) => granted.has(p));
+  return section.permission === null || granted.has(section.permission);
+}
 
 /**
  * The sidebar shows only sections the user may view (PRD §6.2). This is a UI convenience;
  * the server re-checks every permission. Phase 1 has no auth, so callers pass 'all'.
  */
 export function visibleSections(granted: 'all' | ReadonlySet<string>): AdminSection[] {
-  return ADMIN_SECTIONS.filter(
-    (s) => granted === 'all' || s.permission === null || granted.has(s.permission),
-  );
+  return ADMIN_SECTIONS.filter((s) => granted === 'all' || sectionAllowed(s, granted));
 }
 
 export function findSection(key: string): AdminSection | undefined {

@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { z } from 'zod';
+import { z } from '@/lib/zod';
 import { ForbiddenError } from '@/lib/auth/errors';
 
 const requirePermission = vi.fn();
@@ -64,5 +64,20 @@ describe('defineUserAction', () => {
     const action = defineUserAction({ input: z.object({}), handler: () => Promise.resolve('ok') });
     expect(await action({})).toEqual({ ok: true, data: 'ok' });
     expect(requirePermission).not.toHaveBeenCalled();
+  });
+});
+
+describe('defineAction with a permission that depends on the input', () => {
+  it('resolves the permission before checking it', async () => {
+    requirePermission.mockResolvedValue(access);
+    const action = defineAction({
+      input: z.object({ approval: z.boolean() }),
+      permission: ({ approval }) => Promise.resolve(approval ? 'pages.approve' : 'pages.publish'),
+      handler: () => Promise.resolve('done'),
+    });
+    await action({ approval: true });
+    expect(requirePermission).toHaveBeenLastCalledWith('pages.approve');
+    await action({ approval: false });
+    expect(requirePermission).toHaveBeenLastCalledWith('pages.publish');
   });
 });

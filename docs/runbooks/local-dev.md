@@ -72,6 +72,21 @@ Provisioning never runs these seeds.
 | Template-switch evidence                    | `WRITE_EVIDENCE=1 npm run test:int`                   |
 | Font fallback faces (after adding a family) | `node scripts/generate-font-fallbacks.mjs`            |
 
+## Phase 4: pages, media and scheduled jobs
+
+| Task                                        | How                                                                                               |
+| ------------------------------------------- | ------------------------------------------------------------------------------------------------- |
+| Edit pages and upload photos                | Sign in as `editor@demo.test`, then **Website pages** or **Media library**                        |
+| Run the scheduled-publishing job now        | `curl -H "Authorization: Bearer $CRON_SECRET" http://localhost:3100/api/cron/publish`             |
+| Run housekeeping (abandoned uploads, files) | `curl -H "Authorization: Bearer $CRON_SECRET" http://localhost:3100/api/cron/housekeeping`        |
+| Preview a draft                             | **Preview** in the page editor (a ten-minute link bound to you); **Exit preview** in the dark bar |
+
+On Vercel, `vercel.json` runs both jobs as Vercel Schedules (publish every 5 minutes, housekeeping hourly); the routes check `CRON_SECRET` (plan P4-I).
+
+**Addresses and statuses.** `proxy.ts` answers old addresses (renamed or moved pages) with a 308, from a copy of the `redirects` table it refreshes every 30 seconds. A page address the server hasn't rendered yet gets a soft "not found" (200 with `noindex`) on its very first visit and a real 404 after that: Next.js sends the prerendered shell before the page decides (Cache Components).
+
+**E2E.** `e2e/cms.spec.ts` covers the Phase 4 journeys. `e2e/approval.spec.ts` switches the site-wide approval setting, so it runs in its own Playwright project after all the others. The editor's journey waits for the next whole minute to test scheduling, so it takes about two minutes.
+
 ## Changing auth settings
 
 `supabase/config.toml` holds the local auth settings: sign-up disabled, 12-character passwords, TOTP, email templates and rate limits. After editing it, `npx supabase stop && npm run db:start`.

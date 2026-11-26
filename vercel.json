@@ -1,0 +1,15 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "schedules": {
+    "publish-scheduled-content": {
+      "schedule": "*/5 * * * *",
+      "path": "/api/cron/publish",
+      "requestMethod": "GET"
+    },
+    "housekeeping": {
+      "schedule": "7 * * * *",
+      "path": "/api/cron/housekeeping",
+      "requestMethod": "GET"
+    }
+  }
+}

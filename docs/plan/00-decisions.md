@@ -9,13 +9,13 @@ The open questions in spec §9 were not individually answered. Each one therefor
 | Q1 plan tiers | Vercel Pro + Supabase Pro; Turnstile fallback kept ready | Phase 14 |
 | Q2 account ownership | Altrastate-managed orgs; school = billing contact | Phase 15 |
 | Q3 medical section | Off; cannot be enabled until a DPPA s.9 review is recorded | Phase 12 |
-| Q4 approval workflow | Off by default; when on, `approve` gates publishing | Phase 4 |
+| Q4 approval workflow | **Confirmed 25 Nov 2026 (Phase 4 plan, P4-A):** off by default. When a school turns it on, `approve` is required to publish, schedule, hide, archive or change a live item; `publish` alone is not enough. Review-request emails come with the email dispatcher (Phase 11); a dashboard tile covers it until then | Confirmed |
 | Q5 retention periods | **No default** — retention cron is a no-op and the dashboard warns until set | Phase 13 |
 | Q6 languages | English only; UI strings go through a `t()` catalogue from Phase 1 | Phase 1 (adopted) |
 | Q7 SMS | Email only; `notify()` abstraction with an email adapter | Phase 12 |
 | Q8 template designs | **Decided 25 Nov 2026:** four original designs approved at the Phase 3 design checkpoint (ADR-016) | Confirmed |
 | Q9 paper applications | Included (`admissions.create`) | Phase 12 |
-| Q10 own-items-only editing | No restriction | Phase 4 |
+| Q10 own-items-only editing | **Confirmed 25 Nov 2026 (P4-B):** no restriction. Anyone with `M.edit` edits any item; accountability comes from "Last edited by" and the audit log | Confirmed |
 | Q11 enquiry attachments | Not in v1 | Phase 11 |
 | Q12 privileged auth calls | D13 (audited job + internal webhook route) | Phase 2 |
 | Q13 antivirus scanning | Not in v1; magic-byte + PDF heuristics only | Phase 12 |
@@ -29,7 +29,20 @@ The open questions in spec §9 were not individually answered. Each one therefor
 | Q21 region probe | Run the probe from Kampala before the first production school | Phase 15 |
 | Q22 DSR erase | Anonymise and keep the statistics row; lawyer to confirm | Phase 13 |
 | Q23 video | Embed-only | Phase 9 |
-| Q24 media documents | PDF only | Phase 4 |
+| Q24 media documents | **Confirmed 25 Nov 2026 (P4-C):** PDF only in the media library; office files stay in the resource centre (Phase 11) | Confirmed |
 | Q25 announcement emails | v2 | — |
 | Q26 public forms without JavaScript | **Decided 24 Nov 2026 (ADR-015):** JavaScript required for both public forms, with a `<noscript>` notice giving the school's phone and email (contact) or the paper route (admissions). A no-JS contact path was considered and not recommended: it can't run BotID or Turnstile, so bots would use it | Confirmed |
 | Q27 first-load JavaScript budget | **Decided 25 Nov 2026 (ADR-017):** public routes load the framework runtime (Next.js 16 + React 19, 132 KB gzipped, measured) plus at most 20 KB gzipped of our own JavaScript (15 KB today). MP §10's 120 KB total can't be met with the stack MP §2 pins | Confirmed |
+
+## Phase 4 decisions that change the spec
+
+| ID | Decision | Replaces |
+|---|---|---|
+| P4-D | One autosave working copy **per person** (`content_drafts` key gains `updated_by`), plus an "also editing" notice. ADR-005 | Spec §1.3: one working copy per item |
+| P4-E | `media_usages` is rebuilt by a database trigger in the same statement as the save | Spec §1.3: rebuilt by the app after each save |
+| P4-F | Rich-text images store only the media id; the file and description are resolved at render time | — |
+| P4-G | Uploads: SVG rejected until Phase 5 (logos); no blurhash (the blurred placeholder is enough). ADR-018 | Spec §4.2 SVG sanitisation, blurhash |
+| P4-H | **Revised during build:** `proxy.ts` answers old addresses with a 308 from an in-memory copy of `redirects`, refreshed every 30 s per server instance (no database query per request); the page route also looks one up on a miss. Planned as "page route only", but with Partial Prerendering a redirect from the page arrives as a 200 that only browsers follow (no `Location` header) | Spec §1.3 (proxy reads a cached map), refined |
+| P4-I | Scheduled publishing and housekeeping run as **Vercel Schedules with path targets** (`GET`, `Authorization: Bearer CRON_SECRET`, which path targets send). A private `function` target was not used: MP §5 specifies the `/api/cron/*` route with `CRON_SECRET`, App Router route handlers aren't standalone build-output functions, and the routes stay testable without Vercel | Spec §4.8 `vercel.json` crons |
+| P4-J | Pages are reordered with move buttons; drag-and-drop comes with Phase 5 | Spec §5.4 "drag to reorder/nest" (Phase 4 part) |
+| P4-L | Trash is emptied automatically by the Phase 13 retention job; until then nothing is deleted without a person | — |

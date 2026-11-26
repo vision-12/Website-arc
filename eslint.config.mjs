@@ -103,6 +103,28 @@ export default defineConfig([
   },
 
   // Playwright fixtures call `use()`, which is not React's hook.
+  {
+    // Zod's JIT probe trips the strict CSP; every value import goes through src/lib/zod.ts.
+    files: ['src/**/*.{ts,tsx}'],
+    ignores: ['src/lib/zod.ts', ...ADMIN_CLIENT_ALLOWED, 'src/features/templates/**'],
+    rules: {
+      'no-restricted-imports': [
+        'error',
+        {
+          paths: [
+            ...ADMIN_CLIENT_PATHS,
+            {
+              name: 'zod',
+              message: "Import { z } from '@/lib/zod' (Zod's JIT probe is a CSP violation).",
+              allowTypeImports: true,
+            },
+          ],
+          patterns: ADMIN_CLIENT_PATTERNS,
+        },
+      ],
+    },
+  },
+
   { files: ['e2e/**'], rules: { 'react-hooks/rules-of-hooks': 'off' } },
 
   // Tests may use non-null assertions and loose typing for fixtures.

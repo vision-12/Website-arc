@@ -17,6 +17,7 @@ const SECTIONS = [
   'Users & permissions',
   'Settings',
   'Activity log',
+  'Trash',
 ];
 
 test.describe('admin shell (signed in as a school administrator, who sees every section)', () => {
@@ -36,7 +37,7 @@ test.describe('admin shell (signed in as a school administrator, who sees every 
     expect(cspViolations).toEqual([]);
   });
 
-  test('desktop sidebar lists all 15 sections and marks the current one', async ({
+  test('desktop sidebar lists all 16 sections and marks the current one', async ({
     page,
     cspViolations,
   }, info) => {

@@ -1,5 +1,6 @@
 import { NextResponse, type NextRequest } from 'next/server';
 import { buildCsp, createNonce } from '@/lib/security/csp';
+import { isContentPath, lookupRedirect } from '@/lib/redirects/proxy-map';
 import { refreshSession } from '@/lib/supabase/proxy';
 
 export const NONCE_HEADER = 'x-nonce';
@@ -11,12 +12,28 @@ const isTemplatePreview = (pathname: string) => pathname.startsWith('/preview/te
 export async function proxy(request: NextRequest) {
   const { pathname, search } = request.nextUrl;
 
+  // Old addresses (renamed or moved pages) answer with a real 308 before anything renders (P4-H).
+  if ((request.method === 'GET' || request.method === 'HEAD') && isContentPath(pathname)) {
+    const lower = pathname.toLowerCase();
+    const target =
+      lower !== pathname
+        ? { to: lower, status: 308 as const }
+        : await lookupRedirect(
+            pathname,
+            process.env.NEXT_PUBLIC_SUPABASE_URL ?? '',
+            process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY ?? '',
+          );
+    if (target)
+      return NextResponse.redirect(new URL(target.to + search, request.url), target.status);
+  }
+
   const nonce = createNonce();
   const csp = buildCsp({
     nonce,
     supabaseUrl: process.env.NEXT_PUBLIC_SUPABASE_URL || 'http://127.0.0.1:54321',
     isDev: process.env.NODE_ENV === 'development',
     frameAncestors: isTemplatePreview(pathname) ? 'self' : 'none',
+    allowWasm: isAdminPath(pathname),
   });
 
   // Next.js reads the nonce from the request's CSP header and applies it to its own scripts.
@@ -47,6 +64,11 @@ export async function proxy(request: NextRequest) {
   ) {
     result.headers.set('Cache-Control', 'private, no-store');
     result.headers.set('X-Robots-Tag', 'noindex, nofollow');
+  }
+  // Draft preview (MP §5): never indexed, never cached by a shared cache.
+  if (request.cookies.has('__prerender_bypass')) {
+    result.headers.set('X-Robots-Tag', 'noindex, nofollow');
+    result.headers.set('Cache-Control', 'private, no-store');
   }
   return result;
 }
