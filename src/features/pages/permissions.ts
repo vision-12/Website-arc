@@ -1,12 +1,23 @@
 import 'server-only';
-import { getSiteSettings } from '@/features/cms/settings/queries';
+import { createClient } from '@/lib/supabase/server';
+import { z } from '@/lib/zod';
 import { publishAction, type EditorContext, type ModuleAction } from '@/features/content/lifecycle';
 import type { Access } from '@/lib/auth/access';
 
-/** Whether the school's approval workflow is on (Q4, P4-A). */
+const Features = z.object({
+  features: z.object({ contentApproval: z.boolean().optional() }).optional(),
+});
+
+/**
+ * Whether the school's approval workflow is on (Q4, P4-A). Read live, not from the cached settings:
+ * the database trigger enforces the live value, and the buttons and permission checks must agree
+ * with it the moment the setting changes. Admin pages and actions are request-time anyway.
+ */
 export async function approvalOn(): Promise<boolean> {
-  const { settings } = await getSiteSettings();
-  return settings.features.contentApproval;
+  const supabase = await createClient();
+  const { data } = await supabase.from('site_settings').select('data').eq('id', 1).maybeSingle();
+  const parsed = Features.safeParse(data?.data);
+  return parsed.success && parsed.data.features?.contentApproval === true;
 }
 
 /** The permission publishing, scheduling and hiding need right now (spec §2.3). */

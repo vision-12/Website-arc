@@ -424,7 +424,9 @@ export function RichTextEditor({
         class: 'rte-content min-h-80 max-w-none px-4 py-3 focus:outline-none',
       },
     },
-    onUpdate: ({ editor: e }) => onChange(e.getJSON() as TiptapDoc),
+    // ProseMirror builds attrs as null-prototype objects, which Server Actions can't carry (the
+    // attributes were silently dropped). A JSON round trip makes plain objects.
+    onUpdate: ({ editor: e }) => onChange(JSON.parse(JSON.stringify(e.getJSON())) as TiptapDoc),
     ...(onBlur ? { onBlur: () => onBlur() } : {}),
   });
   const refs = useMemo(() => new Map(Object.entries(media)), [media]);

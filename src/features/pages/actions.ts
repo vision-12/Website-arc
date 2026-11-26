@@ -5,7 +5,6 @@ import { defineAction } from '@/lib/actions/define';
 import { ActionFailure } from '@/lib/actions/errors';
 import { logActivity } from '@/lib/audit/log';
 import { CacheTags } from '@/lib/cache/tags';
-import { warmAddresses } from '@/lib/cache/warm';
 import { serverEnv } from '@/lib/env/server';
 import { createClient } from '@/lib/supabase/server';
 import { signDraftToken } from '@/features/content/draft-token';
@@ -227,7 +226,6 @@ export const movePage = defineAction({
       ])
         updateTag(tag);
     }
-    if (before.published_at && before.path !== after.path) warmAddresses([before.path]);
     return { version: after.version, path: after.path };
   },
 });

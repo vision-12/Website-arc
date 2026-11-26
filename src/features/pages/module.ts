@@ -2,7 +2,6 @@ import 'server-only';
 import { ActionFailure } from '@/lib/actions/errors';
 import { CacheTags } from '@/lib/cache/tags';
 import { TiptapDoc } from '@/lib/rich-text/schema';
-import { warmAddresses } from '@/lib/cache/warm';
 import { asJson } from '@/lib/supabase/json';
 import { contentService } from '@/features/content/service';
 import { nextSlug } from '@/features/content/slug';
@@ -77,7 +76,4 @@ export const pagesContent = contentService<PageValues, PageRow, PagePatch>({
       ? new ActionFailure('VALIDATION', ADDRESS_TAKEN, { slug: [ADDRESS_TAKEN] })
       : null,
   renameOnRestore: (row) => ({ slug: nextSlug(row.slug) }),
-  afterWrite: (before, after) => {
-    if (before.published_at && before.path !== after.path) warmAddresses([before.path]);
-  },
 });

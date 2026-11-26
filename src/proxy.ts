@@ -1,5 +1,6 @@
 import { NextResponse, type NextRequest } from 'next/server';
 import { buildCsp, createNonce } from '@/lib/security/csp';
+import { isContentPath, lookupRedirect } from '@/lib/redirects/proxy-map';
 import { refreshSession } from '@/lib/supabase/proxy';
 
 export const NONCE_HEADER = 'x-nonce';
@@ -10,6 +11,21 @@ const isTemplatePreview = (pathname: string) => pathname.startsWith('/preview/te
 
 export async function proxy(request: NextRequest) {
   const { pathname, search } = request.nextUrl;
+
+  // Old addresses (renamed or moved pages) answer with a real 308 before anything renders (P4-H).
+  if ((request.method === 'GET' || request.method === 'HEAD') && isContentPath(pathname)) {
+    const lower = pathname.toLowerCase();
+    const target =
+      lower !== pathname
+        ? { to: lower, status: 308 as const }
+        : await lookupRedirect(
+            pathname,
+            process.env.NEXT_PUBLIC_SUPABASE_URL ?? '',
+            process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY ?? '',
+          );
+    if (target)
+      return NextResponse.redirect(new URL(target.to + search, request.url), target.status);
+  }
 
   const nonce = createNonce();
   const csp = buildCsp({

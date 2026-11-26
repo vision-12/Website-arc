@@ -20,6 +20,13 @@ import { can, getAccess } from '@/lib/auth/access';
  * for a redirect (old address after a rename or move) before showing "not found" (plan P4-H).
  */
 
+/**
+ * A blocking route: an address Next hasn't rendered yet is rendered in full before anything is
+ * sent (no empty App Shell), so "not found" is a real 404 and an old address a real 308 from the
+ * first visit (plan P4-H). Pages listed by generateStaticParams are prerendered at build anyway.
+ */
+export const instant = false;
+
 const toPath = (slug: string[]) => `/${slug.join('/')}`;
 
 export async function generateStaticParams() {

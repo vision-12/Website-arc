@@ -75,8 +75,6 @@ export interface ContentModule<V, Row extends ContentRowBase, Patch> {
   writeError?(error: unknown): ActionFailure | null;
   /** A patch that frees the row's address when restoring collides with a live item. */
   renameOnRestore?(row: Row): Partial<Patch> | null;
-  /** Runs after every successful write (e.g. warm a page's old address after a rename). */
-  afterWrite?(before: Row, after: Row): void;
 }
 
 export interface WorkingCopy<V> {
@@ -391,7 +389,6 @@ export function contentService<V, Row extends ContentRowBase, Patch>(
         ...t.metadata,
       });
       expireTags(before, after);
-      m.afterWrite?.(before, after);
       return result(after);
     },
 

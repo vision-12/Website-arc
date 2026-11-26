@@ -136,6 +136,8 @@ export function PageEditor(props: PageEditorProps) {
   const [now, setNow] = useState(props.renderedAt);
   const [errors, setErrors] = useState<FieldErrors>({});
   const [conflict, setConflict] = useState(false);
+  // Tiptap reads its content once; replacing the body from outside (Show my changes) remounts it.
+  const [bodyKey, setBodyKey] = useState(0);
   const [dialog, setDialog] = useState<'schedule' | 'sendBack' | 'cover' | null>(null);
   const [busy, setBusy] = useState<EditorAction | 'discard' | 'preview' | null>(null);
   const [, start] = useTransition();
@@ -308,6 +310,7 @@ export function PageEditor(props: PageEditorProps) {
           onShow={() => {
             const shown = merge(props.values, staleCopy);
             setValues(shown);
+            setBodyKey((k) => k + 1);
             setStaleCopy(null);
             autosave.changed(shown);
           }}
@@ -423,6 +426,7 @@ export function PageEditor(props: PageEditorProps) {
               Page text
             </span>
             <RichTextEditor
+              key={bodyKey}
               value={values.body}
               onChange={(body: TiptapDoc) => update({ body })}
               media={media}
